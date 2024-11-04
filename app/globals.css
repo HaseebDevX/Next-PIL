@@ -52,6 +52,8 @@ body,
 }
 
 @layer utilities {
+ 
+  
   .btn {
     @apply bg-purple hover:bg-purpledark text-white font-bold px-6 py-3.5 rounded-md min-w-[120px] shadow-md;
   }
@@ -62,4 +64,32 @@ body,
   .nav li a.active {
     @apply bg-purpledark;
   }
+}
+
+@font-face {
+  font-family: 'F37Ginger-Regular';
+  src: url('/fonts/F37Ginger-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'F37Ginger-Bold';
+  src: url('/fonts/F37Ginger-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'F37Wicklow-Medium';
+  src: url('/fonts/F37Wicklow-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'F37Wicklow-Regular';
+  src: url('/fonts/F37Wicklow-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }

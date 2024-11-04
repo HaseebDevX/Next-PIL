@@ -14,7 +14,9 @@ const config = {
     },
     extend: {
       colors: {
-        purple: '#511E84',
+        // purple: '#511E84',
+        purple: '#683D94',
+        graywhite: '#F5F5F5',
         purpledark: '#431471',
         purpledark2: '#340b5b',
         lightpurple: '#f6f3f8',
@@ -70,6 +72,12 @@ const config = {
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+      },
+      fontFamily: {
+        gingerRegular: ['F37Ginger-Regular'],
+        gingerBold: ['F37Ginger-Bold'],
+        wicklowMedium: ['F37Wicklow-Medium'],
+        wicklowRegular: ['F37Wicklow-Regular'],
       },
     },
   },
