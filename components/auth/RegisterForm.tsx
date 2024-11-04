@@ -222,8 +222,8 @@ export function RegisterForm() {
               I consent to receive text messages from paininjurylaw about services.
             </label     >
           </div>
-          <Button className='w-full p-6' disabled={isPending} type='submit'>
-            Create an account
+          <Button className='w-full p-6 bg-purple' disabled={isPending} type='submit'>
+            Create Account
           </Button>
         </form>
       </Form>
