@@ -1,0 +1,229 @@
+// prisma/schema.prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum AccountRole {
+  Client
+  Injured_Party
+  Witness
+  Defendant
+  Hospital
+  Treating_Facility
+  Passenger
+  Auto_Insurance_Company
+  Health_Insurance_Company
+}
+
+enum WereYouInjured {
+  Yes // Yes, I was Injured
+  Someone // No, Someone else was Injured
+  No // No Injuries
+}
+
+enum MaritalStatus {
+  Single
+  Married
+  Divorced
+  Separated
+}
+
+enum EmploymentStatus {
+  Employed
+  Self_Employed
+  Student
+  Unemployed
+}
+
+enum ClaimType {
+  Car_Accident
+  Workers_Compensation
+  Construction_Accident
+  Workplace_Accident
+  Motorcycle_Accident
+  Pedestrian_Accident
+  Trucking_Accident
+  Bicycle_Accident
+  Bus_Accident
+  Train_Accident
+  Burn_Injury
+  MTA_Accident
+  Ride_Share_Accident
+  Salon_Accident
+  Amusement_Park_Accident
+  Dog_Bite
+  Slip_And_Fall
+  Premise_Liability
+  Negligence_Security
+  Nursing_Home
+  Medical_Malpractice
+  Aviation_Accident
+  Birth_Injury
+  Wrongful_Death
+}
+
+enum ClaimStatus {
+  PENDING_INFORMATION
+  UNDER_REVIEW
+  ACCEPTED
+  INVESTIGATION
+  REJECTED
+  CLOSED
+}
+
+enum InjuryPoint {
+  Shoulder
+  Elbow
+  Leg
+  Knee
+  Hip_Pelvic
+  Arm
+  Wrist
+  Thigh
+  Ankle
+  Finger
+  Toe
+  Hand
+  Foot
+  Other
+}
+
+enum InjurySide {
+  Left
+  Right
+  Both
+}
+
+enum InjuryType {
+  Laceration
+  Contusion_Bruises
+  Broken
+  Fracture
+  Tear
+  Sprain
+}
+
+enum driverOrPassenger {
+  Driver
+  Passenger
+}
+
+enum DefendantRole {
+  Operator
+  Owner
+  Operator_Owner
+  Other
+}
+
+model User {
+  id                    String                 @id @default(cuid())
+  firstname             String
+  lastname              String
+  email                 String                 @unique
+  phone                 String
+  fax                   String?
+  injured               WereYouInjured
+  claimType             ClaimType
+  emailVerified         DateTime?
+  image                 String?
+  password              String
+  isTwoFactorEnabled    Boolean                @default(false)
+  twoFactorConfirmation TwoFactorConfirmation?
+  ip                    String?
+  role                  UserRole               @default(USER)
+  claims                Claim[]
+}
+
+model VerificationToken {
+  id                      String   @id @default(cuid())
+  email                   String
+  token                   String   @unique
+  expires                 DateTime
+  request_email_change_by String?
+
+  @@unique([email, token])
+}
+
+model PasswordResetToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model TwoFactorToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model TwoFactorConfirmation {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId])
+}
+
+model Claim {
+  id        Int          @id @default(autoincrement())
+  name      String?
+  type      ClaimType?
+  status    ClaimStatus?
+  roles     Role[]
+  user      User         @relation(fields: [userId], references: [id])
+  userId    String
+  accounts  Account[]    @relation("ClaimToAccount")
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model Role {
+  id         Int      @id @default(autoincrement())
+  claim      Claim    @relation(fields: [claimId], references: [id])
+  claimId    Int
+  account    Account  @relation(fields: [accountId], references: [id])
+  accountId  Int
+  roleType   RoleType @relation(fields: [roleTypeId], references: [id])
+  roleTypeId Int
+
+  @@index([claimId])
+  @@index([accountId])
+  @@index([roleTypeId])
+}
+
+model RoleType {
+  id       Int         @id @default(autoincrement())
+  roleName AccountRole
+  roles    Role[]
+}
+
+model Account {
+  id             Int     @id @default(autoincrement())
+  firstName      String
+  lastName       String
+  phone1         String
+  phone2         String?
+  email          String?
+  fax            String?
+  mailingAddress String?
+  billingAddress String?
+  roles          Role[]
+  claims         Claim[] @relation("ClaimToAccount")
+}
