@@ -79,7 +79,7 @@ export function RegisterForm() {
         <HeaderLogo />
       </div>
       <div className='flex w-full flex-col items-center justify-center bg-graywhite p-6 md:w-2/3 md:p-10'>
-        <div className=' h-[850px] items-start justify-items-start   '>
+        <div className=' items-start justify-items-start   '>
           <p className='font-wicklowMedium text-[30px] font-bold text-black'>Already have an account?</p>
           <Link
             className='mt-2 flex w-max items-center rounded-lg bg-purple px-4 py-2 font-gingerRegular text-[20px] font-bold text-white'
