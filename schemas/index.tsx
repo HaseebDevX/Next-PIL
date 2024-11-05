@@ -1,4 +1,4 @@
-import { UserRole, ClaimType } from '@prisma/client';
+import { UserRole, ClaimType,WereYouInjured } from '@prisma/client';
 import * as zod from 'zod';
 
 export const LoginSchema = zod.object({
@@ -14,7 +14,8 @@ export const RegisterSchema = zod.object({
     message: 'Email is required',
   }),
   password: zod.string().min(6, { message: 'Password is required' }),
-  name: zod.string().min(1, { message: 'Name is required' }),
+  firstname: zod.string().min(1, { message: 'Name is required' }),
+  lastname: zod.string().min(1, { message: 'Last name is required' }),
   phone: zod.string().min(1, { message: 'Phone is required' }),
   claimType: zod.enum(
     [
@@ -44,6 +45,14 @@ export const RegisterSchema = zod.object({
       ClaimType.Wrongful_Death,
     ],
     { message: 'Claim Type is required' }
+  ),
+  injured: zod.enum(
+    [
+      WereYouInjured.Yes,
+      WereYouInjured.No,
+      WereYouInjured.Someone,
+    ],
+    { message: 'Injured is required' }
   ),
 });
 

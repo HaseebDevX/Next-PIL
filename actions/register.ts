@@ -16,7 +16,7 @@ export const register = async (values: zod.infer<typeof RegisterSchema>) => {
 
   if (!validatedFields.success) return { error: 'Invalid fields' };
 
-  const { email, password, name, phone, claimType } = validatedFields.data;
+  const { email, password, firstname, lastname, phone, claimType, injured } = validatedFields.data;
 
   const headersList = headers();
   const userIp = headersList.get('request-ip');
@@ -43,9 +43,11 @@ export const register = async (values: zod.infer<typeof RegisterSchema>) => {
 
   await db.user.create({
     data: {
-      name,
+      firstname,
+      lastname,
       phone,
       claimType,
+      injured,
       email,
       password: hashedPassword,
       ip: hashedIp,
