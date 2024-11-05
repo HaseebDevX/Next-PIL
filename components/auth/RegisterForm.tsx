@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import * as zod from 'zod';
-import { ClaimType,WereYouInjured } from '@prisma/client';
+import { ClaimType, WereYouInjured } from '@prisma/client';
 import Image from 'next/image';
 import logo from '@/public/logo.png';
 import rImage from '@/public/icons/Rimage.svg';
@@ -45,12 +45,16 @@ export function RegisterForm() {
       });
     });
   };
+  const HeaderLogo = () => {
+    return <Image alt='Paininjurylaw' className='' height={44} priority src={logo} width={240} />;
+  };
   return (
     <div className='flex h-screen min-h-max flex-col md:flex-row'>
       <div className='hidden w-1/3 flex-col justify-between bg-purple p-10 text-white md:flex'>
-        <Image alt='Paininjurylaw' className='' height={44} priority src={logo} width={240} />
+        {/* <Image alt='Paininjurylaw' className='' height={44} priority src={logo} width={240} /> */}
+        <HeaderLogo />
         <div>
-          <h1 className='font-wicklowRegular mb-6 text-4xl font-medium'>
+          <h1 className='mb-6 font-wicklowRegular text-4xl font-medium'>
             Getting Injured Is Hard. <br />
             Getting Legal Help Doesn't Have to Be.
           </h1>
@@ -63,7 +67,7 @@ export function RegisterForm() {
               <p className='space text-sm'>★★★★★</p>
             </div>
           </div>
-          <p className='font-gingerRegular mt-5 text-sm'>
+          <p className='mt-5 font-gingerRegular text-sm'>
             Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text
             of the printing.
           </p>
@@ -71,18 +75,23 @@ export function RegisterForm() {
       </div>
 
       {/* Right Section: Form */}
+      <div className='flex  items-center justify-center bg-purple py-2.5 md:hidden lg:hidden xl:hidden '>
+        <HeaderLogo />
+      </div>
       <div className='flex w-full flex-col items-center justify-center bg-graywhite p-6 md:w-2/3 md:p-10'>
-        <div className=' h-[850px] w-[499px] items-start justify-items-start   '>
-          <div className='text-right'>
-            <p className='font-wicklowMedium text-[30px] font-bold text-black'>Already have an account?</p>
-            <Link className='font-gingerRegular w-max mt-2 flex items-center rounded-lg bg-purple px-4 py-2 text-[20px] font-bold text-white'  href='/login'>
-              Login
-              <span className='ml-6'>
-                <Image alt='Paininjurylaw' className='' height={24} priority src={arrowRight} width={24} />{' '}
-              </span>
-            </Link>
-          </div>
-          <h2 className='font-wicklowMedium mt-8 text-[30px] font-bold text-gray-800'>Create Your Account</h2>
+        <div className=' h-[850px] items-start justify-items-start   '>
+          <p className='font-wicklowMedium text-[30px] font-bold text-black'>Already have an account?</p>
+          <Link
+            className='mt-2 flex w-max items-center rounded-lg bg-purple px-4 py-2 font-gingerRegular text-[20px] font-bold text-white'
+            href='/login'
+          >
+            Login
+            <span className='ml-6'>
+              <Image alt='Paininjurylaw' className='' height={24} priority src={arrowRight} width={24} />{' '}
+            </span>
+          </Link>
+
+          <h2 className='mt-8 font-wicklowMedium text-[30px] font-bold text-gray-800'>Create Your Account</h2>
 
           <Form {...form}>
             <form className='space-y-4' onSubmit={form.handleSubmit(onSubmit)}>
@@ -126,7 +135,7 @@ export function RegisterForm() {
                     <FormItem>
                       <FormLabel>Phone*</FormLabel>
                       <FormControl>
-                        <Input {...field} disabled={isPending} placeholder='Phone number'/>
+                        <Input {...field} disabled={isPending} placeholder='Phone number' />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -145,7 +154,7 @@ export function RegisterForm() {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder='Select  '/>
+                            <SelectValue placeholder='Select  ' />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
