@@ -6,6 +6,8 @@ import { useForm } from 'react-hook-form';
 import * as zod from 'zod';
 import { ClaimType, WereYouInjured } from '@prisma/client';
 import Image from 'next/image';
+import Link from 'next/link';
+
 import logo from '@/public/logo.png';
 import rImage from '@/public/icons/Rimage.svg';
 import arrowRight from '@/public/icons/arrow-right.svg';
@@ -18,7 +20,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { RegisterSchema } from '@/schemas';
-import Link from 'next/link';
 
 export function RegisterForm() {
   const [error, setError] = useState<string | undefined>('');
@@ -49,16 +50,22 @@ export function RegisterForm() {
     return <Image alt='Paininjurylaw' className='' height={44} priority src={logo} width={240} />;
   };
 
+  const WereYouInjuredLabels: Record<string, string> = {
+    Yes: 'Yes, I was Injured',
+    Someone: 'No, Someone else was Injured',
+    No: 'No Injuries'
+  };
+
   return (
-    <div className='flexflex-col md:flex-row'>
+    <div className=''>
       {/* Right Section */}
       <div className='flex  items-center justify-center bg-purple py-2.5 md:hidden lg:hidden xl:hidden '>
         <HeaderLogo />
       </div>
 
-      <div className='flex h-screen flex-col  border-8 border-green-500 p-6 '>
+      <div className='flex h-screen flex-col '>
         <div>
-          <p className='font-wicklowMedium text-[30px] font-bold text-black'>Already have an account?</p>
+          <p className='font-wicklowMedium text-[30px] font-bold text-black mt-6'>Already have an account?</p>
           <Link
             className='font-gingerRegular mt-2 flex w-max items-center rounded-lg bg-purple px-4 py-2 text-[20px] font-bold text-white'
             href='/login'
@@ -73,7 +80,7 @@ export function RegisterForm() {
 
           <Form {...form}>
             <form className='space-y-4' onSubmit={form.handleSubmit(onSubmit)}>
-              <div className='space-y-4'>
+              <div className='space-y-2'>
                 <div className='flex space-x-4'>
                   <div className='w-1/2'>
                     <FormField
@@ -136,10 +143,10 @@ export function RegisterForm() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {Object.values(WereYouInjured).map((el) => (
-                            <SelectItem key={el} value={el}>
-                              {el.replaceAll('_', ' ')}
-                            </SelectItem>
+                          {Object.entries(WereYouInjuredLabels).map(([value,label]) => (
+                            <SelectItem key={value} value={value}>
+                              {label} 
+                              </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -206,8 +213,8 @@ export function RegisterForm() {
               <FormSuccess message={success} />
               <div className='flex items-center'>
                 <input
-                  type='checkbox'
                   className='text-purple-600 focus:ring-purple-500 h-4 w-4 rounded border-gray-300'
+                  type='checkbox'
                 />
                 <label className='ml-2 text-sm text-gray-700'>
                   I consent to receive text messages from paininjurylaw about services.

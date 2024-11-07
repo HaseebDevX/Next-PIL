@@ -75,10 +75,22 @@ enum ClaimType {
 enum ClaimStatus {
   PENDING_INFORMATION
   UNDER_REVIEW
-  ACCEPTED
+  PENDING_DOCUMENTS
   INVESTIGATION
-  REJECTED
-  CLOSED
+  PRE_SUIT
+  PRE_LITIGATION
+  LITIGATION
+  RESOLVED_AND_CLOSED
+}
+
+enum Relationship {
+  Self
+  Parent
+  Child
+  Sibiling
+  Friend
+  Representative
+  Other
 }
 
 enum InjuryPoint {
@@ -126,22 +138,54 @@ enum DefendantRole {
 }
 
 model User {
-  id                    String                 @id @default(cuid())
-  firstname             String
-  lastname              String
-  email                 String                 @unique
-  phone                 String
-  fax                   String?
-  injured               WereYouInjured
-  claimType             ClaimType
-  emailVerified         DateTime?
-  image                 String?
-  password              String
-  isTwoFactorEnabled    Boolean                @default(false)
-  twoFactorConfirmation TwoFactorConfirmation?
-  ip                    String?
-  role                  UserRole               @default(USER)
-  claims                Claim[]
+  id                        String                 @id @default(cuid())
+  firstname                 String
+  middleName                String?
+  lastname                  String
+  gender                    String?
+  dateOfBirth               DateTime?
+  isUnder18                 Boolean                @default(false)
+  fatherFirstName           String?
+  fatherLastName            String?
+  motherFirstName           String?
+  motherLastName            String?
+  mailingAddress1           String?
+  mailingAddress2           String?
+  mailingCity               String?
+  mailingState              String?
+  mailingZipCode            String?
+  isPOBoxOrDifferentAddress Boolean                @default(false)
+  physicalAddress1          String?
+  physicalAddress2          String?
+  physicalCity              String?
+  physicalState             String?
+  physicalZipCode           String?
+  email                     String                 @unique
+  phone                     String
+  phone2                    String?
+  fax                       String?
+  consentForElectronicComm  Boolean                @default(true)
+  maritalStatus             String?
+  spouseFirstName           String?
+  spouseLastName            String?
+  spousePhone               String?
+  employmentStatus          String?
+  employerName              String?
+  employerTitle             String?
+  employmentType            String?
+  pay                       String?
+  schoolName                String?
+  expectedGraduationYear    String?
+  injured                   WereYouInjured
+  claimType                 ClaimType
+  emailVerified             DateTime?
+  image                     String?
+  password                  String
+  isTwoFactorEnabled        Boolean                @default(false)
+  twoFactorConfirmation     TwoFactorConfirmation?
+  ip                        String?
+  role                      UserRole               @default(USER)
+  claims                    Claim[]
 }
 
 model VerificationToken {
@@ -182,48 +226,111 @@ model TwoFactorConfirmation {
 }
 
 model Claim {
-  id        Int          @id @default(autoincrement())
-  name      String?
-  type      ClaimType?
-  status    ClaimStatus?
-  roles     Role[]
-  user      User         @relation(fields: [userId], references: [id])
-  userId    String
-  accounts  Account[]    @relation("ClaimToAccount")
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  id                String       @id @default(uuid())
+  name              String?
+  type              ClaimType?   @map("Claim Type")
+  status            ClaimStatus? @map("Status")
+  injured           Boolean?     @map("Were you injured?")
+  relationship      Relationship @map("Relationship")
+  otherRelationship String?      @map("Other Relationship")
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  // Relationship
+  user              User         @relation(fields: [userId], references: [id])
+  userId            String
+
+  incident  Incident?
+  witnessId Witness?
+}
+
+model Incident {
+  id                        String   @id @default(uuid())
+  date                      DateTime @map("Date of Accident")
+  time                      DateTime @map("Time of Accident")
+  timeOfDay                 String   @map("Accident Time of Day") // "AM" or "PM"
+  location                  String?  @map("Incident Location")
+  workRelated               Boolean  @map("Were you at work at the time of the accident?")
+  description               String?  @map("Description of Accident")
+  policeReportCompleted     Boolean  @map("Was a Police Report Filed")
+  policeStation             String?  @map("Police Station/Precinct")
+  policeOfficer             String?  @map("Officer Name and Description")
+  reportCompleted           Boolean  @map("Was an Accident Report or Complaint Report Filed")
+  reportNumber              String?  @map("Accident/Complaint Report Number")
+  supportingDocument        Boolean  @map("Picture Taken?")
+  supportingDocumentUpload  String?  @map("Upload (if yes)")
+  lostEarning               Boolean  @map("Missed time from work or school?")
+  amountLoss                String?  @map("Approximate Loss of Earning")
+  timeLoss                  String?  @map("Approximate Missed Time from School? (If in school)")
+  priorRepresentation       Boolean  @map("Do you currently have representation regarding this claim?")
+  namePriorRepresentation   String?  @map("Name of Attorney (If Yes)") // Reference to Role ID for "Plaintiff Law Firm"
+  priorRepresentationReason String?  @map("Reason for wanting to remove your current representation from your claim?")
+  Claim                     Claim    @relation(fields: [claimId], references: [id])
+  claimId                   String   @unique
+}
+
+model Witness {
+  id      String @id @default(uuid())
+  claim   Claim  @relation(fields: [claimId], references: [id])
+  claimId String @unique
+
+  witnessDetails WitnessDetails[]
+
+  @@index([claimId])
+}
+
+model WitnessDetails {
+  id        String  @id @default(uuid())
+  witness   Witness @relation(fields: [witnessId], references: [id], onDelete: Cascade)
+  witnessId String
+
+  role   Role   @relation(fields: [roleId], references: [id])
+  roleId String
+
+  @@index([witnessId])
 }
 
 model Role {
-  id         Int      @id @default(autoincrement())
-  claim      Claim    @relation(fields: [claimId], references: [id])
-  claimId    Int
-  account    Account  @relation(fields: [accountId], references: [id])
-  accountId  Int
-  roleType   RoleType @relation(fields: [roleTypeId], references: [id])
-  roleTypeId Int
+  id String @id @default(uuid())
 
-  @@index([claimId])
-  @@index([accountId])
-  @@index([roleTypeId])
+  // Relationship
+  account        Account          @relation(fields: [accountId], references: [id])
+  accountId      String
+  roletype       RoleType         @relation(fields: [roletypeId], references: [id])
+  roletypeId     String
+  WitnessDetails WitnessDetails[]
 }
 
 model RoleType {
-  id       Int         @id @default(autoincrement())
-  roleName AccountRole
-  roles    Role[]
+  id        String   @id @default(uuid())
+  roleType  String
+  createdAt DateTime @default(now())
+  createdBy String?
+  enable    Boolean?
+
+  // Relationship
+  Role Role[]
 }
 
 model Account {
-  id             Int     @id @default(autoincrement())
-  firstName      String
-  lastName       String
-  phone1         String
-  phone2         String?
-  email          String?
-  fax            String?
-  mailingAddress String?
-  billingAddress String?
-  roles          Role[]
-  claims         Claim[] @relation("ClaimToAccount")
+  id                       String  @id @default(uuid())
+  firstName                String  @map("First Name")
+  lastName                 String  @map("Last Name")
+  email                    String  @map("Email Address")
+  phone                    String  @map("Phone")
+  secondPhone              String? @map("Secondary Phone")
+  faxNumber                String? @map("Fax Number")
+  mailingAddressStreet     String  @map("Mailing Address Street")
+  mailingAddressBuilding   String? @map("Mailing Address Building")
+  mailingAddressCity       String  @map("Mailing City")
+  mailingAddressState      String  @map("Mailing State")
+  mailingAddressPostalCode String  @map("Mailing Zip Code")
+  billingAddressStreet     String  @map("Billing Address Street")
+  billingAddressBuilding   String? @map("Billing Address Building")
+  billingAddressCity       String? @map("Billing Address City")
+  billingAddressState      String? @map("Billing Address State")
+  billingAddressPostalCode String? @map("Billing Zip Code")
+  // Witness                  WitnessDetails[]
+
+  // Relationship
+  Role Role[]
 }

@@ -1,5 +1,5 @@
 import { getClaimByUserId } from '@/data/claims';
-import { AccountForm } from '@/components/account-form/AccountForm';
+import { ProfileForm } from '@/components/account-form/ProfileForm';
 import { getProfileByUserId } from '@/data/profile';
 import { currentSessionUser } from '@/lib/auth-utils';
 import DashboardItems from '@/components/account-form/dashboard-items';
@@ -22,6 +22,6 @@ export default async function DashboardPage() {
       </div>
     );
   } else {
-    return <AccountForm user={userSession} />;
+    return <ProfileForm user={userSession} />;
   }
 }

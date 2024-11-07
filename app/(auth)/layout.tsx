@@ -1,4 +1,6 @@
-import Image from 'next/image';
+/* eslint-disable react/no-unescaped-entities */
+ import Image from 'next/image';
+
 import logo from '@/public/logo.png';
 import rImage from '@/public/icons/Rimage.svg';
 
@@ -9,7 +11,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   return (
     <>
       <div className='flex h-screen flex-col md:flex-row'>
-        <div className='hidden w-1/3 flex-col justify-between bg-purple p-10 text-white md:flex'>
+        <div className='hidden w-2/3  flex-col justify-between bg-purple p-10 text-white md:flex'>
           <HeaderLogo />
           <div>
             <h1 className='font-wicklowRegular mb-6 text-4xl font-medium'>
@@ -31,7 +33,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             </p>
           </div>
         </div>
-        <div className='flex items-start justify-center'>{children}</div>
+        <div className='m-auto flex w-[1440px] flex-col px-64'>{children}</div>
       </div>
     </>
   );

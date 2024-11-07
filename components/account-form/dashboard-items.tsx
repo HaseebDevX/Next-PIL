@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import * as zod from 'zod';
 
-import { AccountSchema } from '@/schemas';
+import { UserProfileSchema } from '@/schemas';
 
-type AccountInfo = zod.infer<typeof AccountSchema>;
+type AccountInfo = zod.infer<typeof UserProfileSchema>;
 interface AccountInfoProps {
   profile?: AccountInfo;
 }
@@ -17,10 +17,10 @@ const DashboardItems = ({ profile }: AccountInfoProps) => {
         <div className='flex w-full flex-col rounded-xl bg-white p-6 shadow-sm'>
           <h2 className='text-lg font-bold uppercase'>Account details</h2>
           <p>
-            {profile?.id} {profile?.lastName}
+            {profile?.id} {profile?.lastname}
           </p>
           <p>{profile?.email}</p>
-          <p>{profile?.phone1}</p>
+          <p>{profile?.phone}</p>
           <p>{profile?.mailingAddress1}</p>
           <p>15+</p>
           <Link className='btn w-[120px] text-center' href='/dashboard'>

@@ -9,20 +9,20 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import { type ExtendedUser } from '@/next-auth';
-import { accounts } from '@/actions/account';
+import { profile } from '@/actions/profile';
 import { FormError } from '@/components/form-messages/FormError';
 import { FormSuccess } from '@/components/form-messages/FormSuccess';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { AccountSchema } from '@/schemas';
+import { UserProfileSchema } from '@/schemas';
 import { MATERIALSTATUS, EMPLOYMENTSTATUS } from '@/data/constants';
 
 interface UserInfoProps {
   user?: ExtendedUser;
 }
-export function AccountForm({ user }: UserInfoProps) {
+export function ProfileForm({ user }: UserInfoProps) {
   const router = useRouter();
   const [dob, setDob] = useState<Date | null>(new Date());
   const [isEighteen, setIsEighteen] = useState<boolean>(false);
@@ -34,13 +34,16 @@ export function AccountForm({ user }: UserInfoProps) {
   const [success, setSuccess] = useState<string | undefined>('');
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm<zod.infer<typeof AccountSchema>>({
-    resolver: zodResolver(AccountSchema),
+  const CurrentUserID = user?.id;
+
+
+  const form = useForm<zod.infer<typeof UserProfileSchema>>({
+    resolver: zodResolver(UserProfileSchema),
     defaultValues: {
-      id: '',
-      firstName: '',
+      id: CurrentUserID,
+      firstname: '',
       middleName: '',
-      lastName: '',
+      lastname: '',
       gender: '',
       dateOfBirth: new Date(),
       isUnder18: false,
@@ -59,7 +62,7 @@ export function AccountForm({ user }: UserInfoProps) {
       physicalCity: '',
       physicalState: '',
       physicalZipCode: '',
-      phone1: '',
+      phone: '',
       phone2: '',
       email: '',
       consentForElectronicComm: false,
@@ -74,14 +77,13 @@ export function AccountForm({ user }: UserInfoProps) {
       pay: '',
       schoolName: '',
       expectedGraduationYear: '',
-      userId: user?.id,
     },
   });
-  const onSubmit = (values: zod.infer<typeof AccountSchema>) => {
+  const onSubmit = (values: zod.infer<typeof UserProfileSchema>) => {
     setError('');
     setSuccess('');
     startTransition(() => {
-      accounts(values).then((data) => {
+      profile(values).then((data) => {
         setError(data.error);
         setSuccess(data.success);
         if (data.success) {
@@ -104,7 +106,7 @@ export function AccountForm({ user }: UserInfoProps) {
                 <div className='w-full'>
                   <FormField
                     control={form.control}
-                    name='firstName'
+                    name='firstname'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>First Name</FormLabel>
@@ -134,7 +136,7 @@ export function AccountForm({ user }: UserInfoProps) {
                 <div className='w-full'>
                   <FormField
                     control={form.control}
-                    name='lastName'
+                    name='lastname'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Last Name</FormLabel>
@@ -442,7 +444,7 @@ export function AccountForm({ user }: UserInfoProps) {
 
               <FormField
                 control={form.control}
-                name='phone1'
+                name='phone'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Phone 1*</FormLabel>
@@ -694,7 +696,7 @@ export function AccountForm({ user }: UserInfoProps) {
                   />
                 </>
               )}
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name='userId'
                 render={({ field }) => (
@@ -706,7 +708,7 @@ export function AccountForm({ user }: UserInfoProps) {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
             </div>
             <FormError message={error} />
             <FormSuccess message={success} />
