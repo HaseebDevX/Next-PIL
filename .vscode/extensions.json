@@ -1,0 +1,8 @@
+{
+ "recommendations": [
+  "shardulm94.trailing-spaces",
+  "tyriar.sort-lines",
+  "esbenp.prettier-vscode",
+  "shinhwagk.mkstring"
+ ]
+}
