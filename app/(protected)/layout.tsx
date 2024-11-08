@@ -6,20 +6,28 @@ import { NavigationMenu } from '@/components/navbar/NavigationMenu';
 import { Navbar } from '@/components/navbar/Navbar';
 import logo from '@/public/logo.png';
 import { LogoutButton } from '@/components/LogoutButton';
+import { NavbarMobile } from '@/components/navbar/NavBarMobile';
 
 export default async function ProtectedLayout(props: { children: React.ReactNode }) {
   return (
     <>
-      <Navbar>
-        <Image alt='Paininjurylaw' className='' height={55} priority src={logo} width={300} />
-        <NavigationMenu />
-        <LogoutButton>
-          <div className='flex cursor-pointer items-center justify-between rounded-md bg-purpledark p-3 px-5 text-xl hover:bg-purpledark2'>
-            Logout <PowerIcon className='h-6 w-6 text-white' />
-          </div>
-        </LogoutButton>
-      </Navbar>
-      <div className='m-auto flex w-[1170px] flex-col space-y-5 p-8 pl-[332px]'>{props.children}</div>
+      <div className='flex flex-row '>
+        <div className='hidden md:block lg:block xl:block'>
+          <Navbar>
+            <Image alt='Paininjurylaw' className='' height={55} priority src={logo} width={300} />
+            <NavigationMenu />
+            <LogoutButton>
+              <div className='flex cursor-pointer items-center justify-between rounded-md bg-purpledark p-3 px-5 text-xl hover:bg-purpledark2'>
+                Logout <PowerIcon className='h-6 w-6 text-white' />
+              </div>
+            </LogoutButton>
+          </Navbar>
+        </div>
+        <div className='w-full'>{props.children}</div>
+      </div>
+      <footer className='fixed bottom-0 block w-full md:hidden lg:hidden xl:hidden'>
+        <NavbarMobile />
+      </footer>
     </>
   );
 }
