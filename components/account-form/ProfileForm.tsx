@@ -36,7 +36,6 @@ export function ProfileForm({ user }: UserInfoProps) {
 
   const CurrentUserID = user?.id;
 
-
   const form = useForm<zod.infer<typeof UserProfileSchema>>({
     resolver: zodResolver(UserProfileSchema),
     defaultValues: {
@@ -98,605 +97,606 @@ export function ProfileForm({ user }: UserInfoProps) {
 
   if (user) {
     return (
-      <div className='flex rounded-lg bg-white p-8 shadow-lg'>
-        <Form {...form}>
-          <form className='space-y-4' onSubmit={form.handleSubmit(onSubmit)}>
-            <div className='space-y-4'>
-              <div className='flex space-x-2'>
-                <div className='w-full'>
-                  <FormField
-                    control={form.control}
-                    name='firstname'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>First Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={isPending} placeholder='First Name' />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+      <div className='flex flex-row items-center justify-center'>
+        <div className='flex w-full rounded-lg bg-white p-8 shadow-lg md:w-[520px] '>
+          <Form {...form}>
+            <form className='space-y-4' onSubmit={form.handleSubmit(onSubmit)}>
+              <div className='space-y-4'>
+                <div className='flex space-x-2'>
+                  <div className='w-full'>
+                    <FormField
+                      control={form.control}
+                      name='firstname'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>First Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} placeholder='First Name' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className='w-full'>
+                    <FormField
+                      control={form.control}
+                      name='middleName'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Middle Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} placeholder='Middle Name' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className='w-full'>
+                    <FormField
+                      control={form.control}
+                      name='lastname'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Last Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} placeholder='Enter Last Name' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
-                <div className='w-full'>
-                  <FormField
-                    control={form.control}
-                    name='middleName'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Middle Name</FormLabel>
+                <FormField
+                  control={form.control}
+                  name='gender'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Gender</FormLabel>
+                      <Select
+                        // need to set the default value does not come from form defaults
+                        disabled={isPending}
+                        onValueChange={field.onChange}
+                      >
                         <FormControl>
-                          <Input {...field} disabled={isPending} placeholder='Middle Name' />
+                          <SelectTrigger>
+                            <SelectValue placeholder='Select Gender' />
+                          </SelectTrigger>
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className='w-full'>
-                  <FormField
-                    control={form.control}
-                    name='lastname'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Last Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={isPending} placeholder='Enter Last Name' />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-              <FormField
-                control={form.control}
-                name='gender'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Gender</FormLabel>
-                    <Select
-                      // need to set the default value does not come from form defaults
-                      disabled={isPending}
-                      onValueChange={field.onChange}
-                    >
+                        <SelectContent>
+                          <SelectItem value='Male'>Male</SelectItem>
+                          <SelectItem value='Female'>Female</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='dateOfBirth'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Date Of Birth</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder='Select Gender' />
-                        </SelectTrigger>
+                        <div className='flex w-full flex-col'>
+                          <DatePicker
+                            className='h-12 w-full rounded-md border border-input px-3 py-2 shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50'
+                            dateFormat='yyyy-MM-dd'
+                            name='dateOfBirth'
+                            onChange={(date) => {
+                              field.onChange(date);
+                              setDob(date);
+                            }}
+                            placeholderText=''
+                            scrollableYearDropdown
+                            selected={dob}
+                            showYearDropdown
+                            yearDropdownItemNumber={100}
+                          />
+                        </div>
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value='Male'>Male</SelectItem>
-                        <SelectItem value='Female'>Female</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='dateOfBirth'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Date Of Birth</FormLabel>
-                    <FormControl>
-                      <div className='flex w-full flex-col'>
-                        <DatePicker
-                          className='h-12 w-full rounded-md border border-input px-3 py-2 shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50'
-                          dateFormat='yyyy-MM-dd'
-                          name='dateOfBirth'
-                          onChange={(date) => {
-                            field.onChange(date);
-                            setDob(date);
-                          }}
-                          placeholderText=''
-                          scrollableYearDropdown
-                          selected={dob}
-                          showYearDropdown
-                          yearDropdownItemNumber={100}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='isUnder18'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <label className='flex items-start'>
-                        <input
-                          checked={isEighteen}
-                          className='mr-3 block h-[20px] w-[20px]'
-                          onChange={(event) => {
-                            field.onChange(event.target.checked);
-                            setIsEighteen(event.target.checked);
-                          }}
-                          type='checkbox'
-                        />
-                        If under 18 years old
-                      </label>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {isEighteen && (
-                <>
-                  <FormField
-                    control={form.control}
-                    name='fatherFirstName'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Father First Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={isPending} placeholder='Father first name' />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='fatherLastName'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Father Last Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={isPending} placeholder='Father last name' />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='motherFirstName'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Mother First Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={isPending} placeholder='Mother first name' />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='motherLastName'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Mother Last Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={isPending} placeholder='Mother last name' />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </>
-              )}
-
-              <FormField
-                control={form.control}
-                name='mailingAddress1'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Mailing Address 1*</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={isPending} placeholder='Mailing Address 1' />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='mailingAddress2'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Mailing Address 2</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={isPending} placeholder='Mailing Address 2' />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='mailingCity'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Mailing City</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={isPending} placeholder='Mailing City' />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='mailingState'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Mailing State*</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={isPending} placeholder='Mailing State' />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='mailingZipCode'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Mailing Zip Code*</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={isPending} placeholder='Mailing Zip Code' />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='isPOBoxOrDifferentAddress'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <label className='flex items-start'>
-                        <input
-                          checked={isMailing}
-                          className='mr-3 block h-[20px] w-[20px]'
-                          onChange={(event) => {
-                            field.onChange(event.target.checked);
-                            setIsMailing(event.target.checked);
-                          }}
-                          type='checkbox'
-                        />
-                        Is your current mailing address a PO Box or not the same address listed on your state issues
-                        identification? If Yes then please provide Physical Address*
-                      </label>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {isMailing && (
-                <>
-                  <FormField
-                    control={form.control}
-                    name='physicalAddress1'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Physical Address 1</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={isPending} placeholder='Physical Address 1' />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='physicalAddress2'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Physical Address 2</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={isPending} placeholder='Physical Address 2' />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='physicalCity'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Mailing City</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={isPending} placeholder='Mailing City' />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='physicalState'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Mailing State</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={isPending} placeholder='Mailing State' />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='physicalZipCode'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Mailing Zip Code</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={isPending} placeholder='Mailing Zip Code' />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </>
-              )}
-
-              <FormField
-                control={form.control}
-                name='phone'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone 1*</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={isPending} placeholder='Phone 1' />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='phone2'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone 2*</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={isPending} placeholder='Phone 2' />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='email'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email*</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={isPending} placeholder='Email' />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='consentForElectronicComm'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <label className='flex items-start'>
-                        <input
-                          checked={isElectroniccomm}
-                          className='mr-3 block h-[20px] w-[20px]'
-                          name='consentForElectronicComm'
-                          onChange={(event) => {
-                            field.onChange(event.target.checked);
-                            setElectroniccomm(event.target.checked);
-                          }}
-                          type='checkbox'
-                        />
-                        Consent For Electronic Communication*
-                      </label>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='maritalStatus'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Marital Status</FormLabel>
-                    <Select
-                      disabled={isPending}
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        setMaritalStatus(value);
-                      }}
-                    >
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='isUnder18'
+                  render={({ field }) => (
+                    <FormItem>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder='Select' />
-                        </SelectTrigger>
+                        <label className='flex items-start'>
+                          <input
+                            checked={isEighteen}
+                            className='mr-3 block h-[20px] w-[20px]'
+                            onChange={(event) => {
+                              field.onChange(event.target.checked);
+                              setIsEighteen(event.target.checked);
+                            }}
+                            type='checkbox'
+                          />
+                          If under 18 years old
+                        </label>
                       </FormControl>
-                      <SelectContent>
-                        {MATERIALSTATUS.map((item) => (
-                          <SelectItem key={item} value={item}>
-                            {item}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {isEighteen && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name='fatherFirstName'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Father First Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} placeholder='Father first name' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name='fatherLastName'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Father Last Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} placeholder='Father last name' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name='motherFirstName'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Mother First Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} placeholder='Mother first name' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name='motherLastName'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Mother Last Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} placeholder='Mother last name' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
                 )}
-              />
-              {['Married', 'Divorced', 'Separated'].includes(maritalStatus) && (
-                <>
-                  <FormField
-                    control={form.control}
-                    name='spouseFirstName'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Spouse First Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={isPending} placeholder='Spouse first name' />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='spouseLastName'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Spouse Last Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={isPending} placeholder='Spouse last name' />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='spousePhone'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Spouse Phone</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={isPending} placeholder='Spouse Phone' />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </>
-              )}
 
-              <FormField
-                control={form.control}
-                name='employmentStatus'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Employment Status</FormLabel>
-                    <Select
-                      disabled={isPending}
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        setEmploymentStatus(value);
-                      }}
-                    >
+                <FormField
+                  control={form.control}
+                  name='mailingAddress1'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mailing Address 1*</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder='Select' />
-                        </SelectTrigger>
+                        <Input {...field} disabled={isPending} placeholder='Mailing Address 1' />
                       </FormControl>
-                      <SelectContent>
-                        {EMPLOYMENTSTATUS.map((item) => (
-                          <SelectItem key={item} value={item}>
-                            {item}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='mailingAddress2'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mailing Address 2</FormLabel>
+                      <FormControl>
+                        <Input {...field} disabled={isPending} placeholder='Mailing Address 2' />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='mailingCity'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mailing City</FormLabel>
+                      <FormControl>
+                        <Input {...field} disabled={isPending} placeholder='Mailing City' />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='mailingState'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mailing State*</FormLabel>
+                      <FormControl>
+                        <Input {...field} disabled={isPending} placeholder='Mailing State' />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='mailingZipCode'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mailing Zip Code*</FormLabel>
+                      <FormControl>
+                        <Input {...field} disabled={isPending} placeholder='Mailing Zip Code' />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='isPOBoxOrDifferentAddress'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <label className='flex items-start'>
+                          <input
+                            checked={isMailing}
+                            className='mr-3 block h-[20px] w-[20px]'
+                            onChange={(event) => {
+                              field.onChange(event.target.checked);
+                              setIsMailing(event.target.checked);
+                            }}
+                            type='checkbox'
+                          />
+                          Is your current mailing address a PO Box or not the same address listed on your state issues
+                          identification? If Yes then please provide Physical Address*
+                        </label>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {isMailing && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name='physicalAddress1'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Physical Address 1</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} placeholder='Physical Address 1' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name='physicalAddress2'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Physical Address 2</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} placeholder='Physical Address 2' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name='physicalCity'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Mailing City</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} placeholder='Mailing City' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name='physicalState'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Mailing State</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} placeholder='Mailing State' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name='physicalZipCode'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Mailing Zip Code</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} placeholder='Mailing Zip Code' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
                 )}
-              />
-              {employmentStatus === 'Employed' && (
-                <>
-                  <FormField
-                    control={form.control}
-                    name='employerName'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Employer Name</FormLabel>
+
+                <FormField
+                  control={form.control}
+                  name='phone'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone 1*</FormLabel>
+                      <FormControl>
+                        <Input {...field} disabled={isPending} placeholder='Phone 1' />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='phone2'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone 2*</FormLabel>
+                      <FormControl>
+                        <Input {...field} disabled={isPending} placeholder='Phone 2' />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='email'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email*</FormLabel>
+                      <FormControl>
+                        <Input {...field} disabled={isPending} placeholder='Email' />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='consentForElectronicComm'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <label className='flex items-start'>
+                          <input
+                            checked={isElectroniccomm}
+                            className='mr-3 block h-[20px] w-[20px]'
+                            name='consentForElectronicComm'
+                            onChange={(event) => {
+                              field.onChange(event.target.checked);
+                              setElectroniccomm(event.target.checked);
+                            }}
+                            type='checkbox'
+                          />
+                          Consent For Electronic Communication*
+                        </label>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='maritalStatus'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Marital Status</FormLabel>
+                      <Select
+                        disabled={isPending}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          setMaritalStatus(value);
+                        }}
+                      >
                         <FormControl>
-                          <Input {...field} disabled={isPending} placeholder='Employer Name' />
+                          <SelectTrigger>
+                            <SelectValue placeholder='Select' />
+                          </SelectTrigger>
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='employerTitle'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Employer Title</FormLabel>
+                        <SelectContent>
+                          {MATERIALSTATUS.map((item) => (
+                            <SelectItem key={item} value={item}>
+                              {item}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {['Married', 'Divorced', 'Separated'].includes(maritalStatus) && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name='spouseFirstName'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Spouse First Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} placeholder='Spouse first name' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name='spouseLastName'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Spouse Last Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} placeholder='Spouse last name' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name='spousePhone'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Spouse Phone</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} placeholder='Spouse Phone' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
+
+                <FormField
+                  control={form.control}
+                  name='employmentStatus'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Employment Status</FormLabel>
+                      <Select
+                        disabled={isPending}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          setEmploymentStatus(value);
+                        }}
+                      >
                         <FormControl>
-                          <Input {...field} disabled={isPending} placeholder='Employer Title' />
+                          <SelectTrigger>
+                            <SelectValue placeholder='Select' />
+                          </SelectTrigger>
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='employmentType'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Employer Type</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={isPending} placeholder='Employer Type' />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='pay'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Pay</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={isPending} placeholder='Pay' type='number' />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </>
-              )}
-              {employmentStatus === 'Student' && (
-                <>
-                  <FormField
-                    control={form.control}
-                    name='schoolName'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>School Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={isPending} placeholder='School Name' />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='expectedGraduationYear'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Expected Graduation Year</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={isPending} placeholder='Expected Graduation Year' />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </>
-              )}
-              {/* <FormField
+                        <SelectContent>
+                          {EMPLOYMENTSTATUS.map((item) => (
+                            <SelectItem key={item} value={item}>
+                              {item}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {employmentStatus === 'Employed' && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name='employerName'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Employer Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} placeholder='Employer Name' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name='employerTitle'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Employer Title</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} placeholder='Employer Title' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name='employmentType'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Employer Type</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} placeholder='Employer Type' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name='pay'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Pay</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} placeholder='Pay' type='number' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
+                {employmentStatus === 'Student' && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name='schoolName'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>School Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} placeholder='School Name' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name='expectedGraduationYear'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Expected Graduation Year</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} placeholder='Expected Graduation Year' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
+                {/* <FormField
                 control={form.control}
                 name='userId'
                 render={({ field }) => (
@@ -709,14 +709,15 @@ export function ProfileForm({ user }: UserInfoProps) {
                   </FormItem>
                 )}
               /> */}
-            </div>
-            <FormError message={error} />
-            <FormSuccess message={success} />
-            <Button className='w-full p-6' disabled={isPending} type='submit'>
-              Complete Profile
-            </Button>
-          </form>
-        </Form>
+              </div>
+              <FormError message={error} />
+              <FormSuccess message={success} />
+              <Button className='w-full p-6' disabled={isPending} type='submit'>
+                Complete Profile
+              </Button>
+            </form>
+          </Form>
+        </div>
       </div>
     );
   } else {
