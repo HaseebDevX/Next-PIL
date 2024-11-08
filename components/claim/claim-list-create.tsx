@@ -8,18 +8,11 @@ import btnEdit from '@/public/icons/btn-edit.svg';
 
 // import { createClaim } from '@/actions/claim-create';
 import HalfCircleProgressBar from '../ui/half-progress-bar';
+import ThemeChip from '../ui/chip';
 
 const ClaimListCreate = ({ userId }: { userId: string }) => {
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(15);
 
-  useEffect(() => {
-    // Example: Update progress every 1 second
-    const interval = setInterval(() => {
-      setProgress((prev) => (prev < 100 ? prev + 5 : 100));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
   const router = useRouter();
   const createNewClaim = async () => {
     await createClaim(userId).then((claim) => {
@@ -41,7 +34,10 @@ const ClaimListCreate = ({ userId }: { userId: string }) => {
       <div className='flex flex-col '>
         <div className=' bg-purple'>
           <div className='pb-[37px] pt-[43px]'>
-            <HalfCircleProgressBar progress={progress} />
+            <div className='flex flex-col items-center '>
+              <HalfCircleProgressBar progress={progress} />
+              <p className='text-gingerRegular text-themeLightPurple2 pt-2.5 text-[18px]'>Unable to submit claim</p>
+            </div>
           </div>
         </div>
         <div className='flex w-full flex-row justify-center px-[15px] md:px-0 lg:px-0 xl:px-0'>
@@ -59,7 +55,10 @@ const ClaimListCreate = ({ userId }: { userId: string }) => {
             </div>
             <div className='mt-[21px] flex flex-row rounded-[12px] border border-purple bg-white p-[15px]'>
               <div className='flex-grow space-y-[5px]'>
-                <CardHeading title='Car Accident' />
+                <div className='flex flex-row space-x-[5px] '>
+                  <CardHeading title='Car Accident' />
+                  <ThemeChip title='Pending Info' color='bg-themeRed' />
+                </div>
                 <div className='flex flex-row space-x-2.5 '>
                   <SimpleText title='Incident' />
                   <SimpleText textColor='text-themeGreen' title='COMPLETED' />

@@ -24,6 +24,7 @@ const config = {
         themeGreen: '#3D9456',
         themeRed: '#E23535',
         themeLightPurple: '#D3A8FF',
+        themeLightPurple2: '#C083FF',
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',

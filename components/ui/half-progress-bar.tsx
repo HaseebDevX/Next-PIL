@@ -1,30 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
-const HalfCircleProgressBar = ({ progress = 0 }) => {
-  const radius = 50; // radius of the half-circle
-  const circumference = 2 * Math.PI * radius;
+interface ProgressBarProps {
+  progress?: number;
+}
+
+const HalfCircleProgressBar: React.FC<ProgressBarProps> = ({ progress = 0 }) => {
+  const width = 210; // SVG width according to Figma
+  const height = 105; // SVG height according to Figma
+  const radius = 100; // Adjusted radius for the larger half-circle
+  const circumference = Math.PI * radius; // Half-circle circumference (only half of a full circle's circumference)
+
+  // Calculate the stroke-dashoffset based on progress
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
   return (
     <div className='relative flex items-center justify-center'>
-      <svg width='120' height='60' xmlns='http://www.w3.org/2000/svg'>
+      <svg width={width} height={height} xmlns='http://www.w3.org/2000/svg'>
         {/* Background Circle */}
-        <circle cx='60' cy='60' r={radius} className='stroke-gray-200' strokeWidth='10' fill='none' />
+        <circle cx={width / 2} cy={height} r={radius} className='stroke-white' strokeWidth='5' fill='none' />
 
         {/* Progress Circle */}
         <circle
-          cx='60'
-          cy='60'
+          cx={width / 2}
+          cy={height}
           r={radius}
-          className='stroke-blue-500'
-          strokeWidth='10'
+          className='stroke-themeLightPurple2'
+          strokeWidth='5'
           fill='none'
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
-          style={{ transition: 'stroke-dashoffset 0.3s ease' }} // Smooth transition
+          strokeLinecap='round'
+          transform={`rotate(-180 ${width / 2} ${height})`} // Start the progress from the bottom center
+          style={{
+            transition: 'stroke-dashoffset 0.3s ease',
+          }}
         />
       </svg>
-      <div className='absolute pt-10 text-xl font-semibold text-blue-500'>{progress}%</div>
+      <div className='absolute pt-[80px] font-wicklowRegular text-[64px] text-white'>{progress}%</div>
     </div>
   );
 };
