@@ -1,4 +1,4 @@
-import { UserRole, ClaimType,WereYouInjured } from '@prisma/client';
+import { UserRole, ClaimType, WereYouInjured } from '@prisma/client';
 import * as zod from 'zod';
 
 export const LoginSchema = zod.object({
@@ -46,15 +46,18 @@ export const RegisterSchema = zod.object({
     ],
     { message: 'Claim Type is required' }
   ),
-  injured: zod.enum(
-    [
-      WereYouInjured.Yes,
-      WereYouInjured.No,
-      WereYouInjured.Someone,
-    ],
-    { message: 'Injured is required' }
-  ),
+  injured: zod.enum([WereYouInjured.Yes, WereYouInjured.No, WereYouInjured.Someone], {
+    message: 'Injured is required',
+  }),
 });
+// export const ClaimSchema = zod.object({
+//   WereYouInjured: zod.enum([WereYouInjured.Yes, WereYouInjured.No], { message: 'Injured is required' }),
+//   dateOfIncident: zod.date().nullable(),
+//   incidentLocation: zod.string(),
+//   claimType: zod.string(),
+//   scropOfEmployment: zod.date().nullable(),
+//   descOfAccident: zod.date().nullable(),
+// });
 
 export const ResetPasswordSchema = zod.object({
   email: zod.string().email({
@@ -203,9 +206,85 @@ export const UserProfileSchema = zod.object({
 //   }),
 // });
 
+// id                        String   @id @default(uuid())
+// date                      DateTime @map("Date of Accident")
+// time                      DateTime @map("Time of Accident")
+// timeOfDay                 String   @map("Accident Time of Day") // "AM" or "PM"
+// location                  String?  @map("Incident Location")
+// workRelated               Boolean  @map("Were you at work at the time of the accident?") radio
+// description               String?  @map("Description of Accident")
+// policeReportCompleted     Boolean  @map("Was a Police Report Filed")
+// policeStation             String?  @map("Police Station/Precinct")
+// policeOfficer             String?  @map("Officer Name and Description")
+// reportCompleted           Boolean  @map("Was an Accident Report or Complaint Report Filed")
+// reportNumber              String?  @map("Accident/Complaint Report Number")
+// supportingDocument        Boolean  @map("Picture Taken?")
+// supportingDocumentUpload  String?  @map("Upload (if yes)")//TODO:ignored
+// lostEarning               Boolean  @map("Missed time from work or school?")
+// amountLoss                String?  @map("Approximate Loss of Earning")
+// timeLoss                  String?  @map("Approximate Missed Time from School? (If in school)")
+// priorRepresentation       Boolean  @map("Do you currently have representation regarding this claim?")
+// namePriorRepresentation   String?  @map("Name of Attorney (If Yes)") // Reference to Role ID for "Plaintiff Law Firm"
+// priorRepresentationReason String?  @map("Reason for wanting to remove your current representation from your claim?")
+// Claim                     Claim    @relation(fields: [claimId], references: [id])
+// claimId                   String   @unique
+
+export const IncidentSchema = zod.object({
+  injured: zod.boolean(),
+  id: zod.string().optional(),
+  date: zod.date({ required_error: 'Date of incident is required' }),
+  time: zod.string(),
+  timeOfDay: zod.string(),
+  location: zod.string(),
+  workRelated: zod.boolean({ message: 'Work realted required' }),
+  description: zod.string(),
+  policeReportCompleted: zod.boolean({ message: 'Police report required' }),
+  policeStation: zod.string(),
+  policeOfficer: zod.string(),
+  reportCompleted: zod.boolean({ message: 'Report completed is required' }),
+  reportNumber: zod.string(),
+  supportingDocument: zod.boolean({ message: 'Supporting document required' }),
+  supportingDocumentUpload: zod.string(),
+  lostEarning: zod.boolean({ message: 'Lost earning is required' }),
+  amountLoss: zod.string(),
+  timeLoss: zod.string(),
+  priorRepresentation: zod.boolean({ message: 'Prior representation is required' }),
+  namePriorRepresentation: zod.string(),
+  priorRepresentationReason: zod.string(),
+  claimType: zod.enum(
+    [
+      ClaimType.Car_Accident,
+      ClaimType.Workers_Compensation,
+      ClaimType.Construction_Accident,
+      ClaimType.Workplace_Accident,
+      ClaimType.Motorcycle_Accident,
+      ClaimType.Pedestrian_Accident,
+      ClaimType.Trucking_Accident,
+      ClaimType.Bicycle_Accident,
+      ClaimType.Bus_Accident,
+      ClaimType.Train_Accident,
+      ClaimType.Burn_Injury,
+      ClaimType.MTA_Accident,
+      ClaimType.Ride_Share_Accident,
+      ClaimType.Salon_Accident,
+      ClaimType.Amusement_Park_Accident,
+      ClaimType.Dog_Bite,
+      ClaimType.Slip_And_Fall,
+      ClaimType.Premise_Liability,
+      ClaimType.Negligence_Security,
+      ClaimType.Nursing_Home,
+      ClaimType.Medical_Malpractice,
+      ClaimType.Aviation_Accident,
+      ClaimType.Birth_Injury,
+      ClaimType.Wrongful_Death,
+    ],
+    { message: 'Claim Type is required' }
+  ),
+});
 // export const IncidentSchema = zod
 //   .object({
 //     id: zod.number().int().optional(),
+//     claimType: zod.string(),
 //     injured: zod.boolean(),
 //     nameOfInjuredParty: zod.string().nullable().optional(),
 //     relationshipToInjuredParty: zod.string().nullable().optional(),

@@ -264,8 +264,8 @@ model Incident {
   priorRepresentation       Boolean  @map("Do you currently have representation regarding this claim?")
   namePriorRepresentation   String?  @map("Name of Attorney (If Yes)") // Reference to Role ID for "Plaintiff Law Firm"
   priorRepresentationReason String?  @map("Reason for wanting to remove your current representation from your claim?")
-  Claim                     Claim    @relation(fields: [claimId], references: [id])
-  claimId                   String   @unique
+  Claim                     Claim?    @relation(fields: [claimId], references: [id]) //TODO: remove ? from clam and claim. 
+  claimId                   String?   @unique
 }
 
 model Witness {
