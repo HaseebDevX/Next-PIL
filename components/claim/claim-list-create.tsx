@@ -14,6 +14,7 @@ import { getUserById } from '@/data/user';
 import Link from 'next/link';
 import { CardHeading } from './cardHeading';
 import { SimpleText } from './simpleText';
+import { createClaim } from '@/actions/claim-create';
 
 const ClaimListCreate = (prop: { user: any }) => {
   const [progress, setProgress] = useState(15);
@@ -27,9 +28,9 @@ const ClaimListCreate = (prop: { user: any }) => {
   };
   const router = useRouter();
   const createNewClaim = async () => {
-    await createClaim(userId).then((claim) => {
+    await createClaim(prop.user.id).then((claim) => {
       if (claim.success) {
-        router.push('/claim/' + claim.success.id);
+        router.push('claim/' + claim.success.id);
       }
     });
   };
@@ -96,8 +97,11 @@ const ClaimListCreate = (prop: { user: any }) => {
                 </div>
               </div>
             </div>
-            <Link
-              href='/claim/create'
+            <div
+              onClick={() => {
+                createNewClaim();
+              }}
+              // href='/claim/create'
               className='mt-[21px] flex flex-row rounded-[12px] border border-purple bg-white p-[15px]  '
             >
               <div className='flex-grow space-y-[5px]'>
@@ -106,7 +110,7 @@ const ClaimListCreate = (prop: { user: any }) => {
                 <SimpleText title="Let's start your claim process" />
               </div>
               <Image alt='Paininjurylaw' className='' height={24} priority src={arrowRight} width={24} />
-            </Link>
+            </div>
           </div>
         </div>
       </div>

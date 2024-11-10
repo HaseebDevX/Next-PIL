@@ -8,6 +8,7 @@ export const createOrUpdateIncident = async (values: zod.infer<typeof IncidentSc
   const validatedFields = IncidentSchema.safeParse(values);
 
   if (!validatedFields.success) return { error: 'Invalid fields' };
+  console.log(validatedFields.data);
 
   const {
     id,
@@ -32,6 +33,7 @@ export const createOrUpdateIncident = async (values: zod.infer<typeof IncidentSc
     priorRepresentation,
     namePriorRepresentation,
     priorRepresentationReason,
+    claimId,
     claimType,
   } = validatedFields.data;
 
@@ -85,7 +87,7 @@ export const createOrUpdateIncident = async (values: zod.infer<typeof IncidentSc
         priorRepresentation,
         namePriorRepresentation,
         priorRepresentationReason,
-        claimId: '',
+        claimId,
       },
     });
 

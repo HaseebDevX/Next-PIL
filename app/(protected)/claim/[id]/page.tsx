@@ -17,26 +17,55 @@ import { Button } from '@/components/ui/button';
 import { FormError } from '@/components/form-messages/FormError';
 import { FormSuccess } from '@/components/form-messages/FormSuccess';
 import { createOrUpdateIncident } from '@/actions/claim-incident-create-update';
-
+import { useParams } from 'next/navigation';
+import 'react-datepicker/dist/react-datepicker.css';
 export default function CreateNewClaim() {
+  const params = useParams();
+  const claimId = params?.id;
+
+  // const claimId = searchParams.get();
+
   const [error, setError] = useState<string | undefined>('');
   const [success, setSuccess] = useState<string | undefined>('');
   const [dateCreated, setDateCreated] = useState<string>();
   const [isPending, startTransition] = useTransition();
   const form = useForm<zod.infer<typeof IncidentSchema>>({
     resolver: zodResolver(IncidentSchema),
+    defaultValues: {
+      date: new Date(),
+      location: '',
+      description: '',
+      policeOfficer: '',
+      reportNumber: '',
+      amountLoss: '',
+      timeLoss: '',
+      priorRepresentationReason: '',
+
+      injured: false,
+      id: undefined,
+      time: new Date(),
+      timeOfDay: 'PM',
+      workRelated: false,
+      policeReportCompleted: false,
+      policeStation: '',
+      reportCompleted: false,
+      supportingDocument: false,
+      supportingDocumentUpload: '',
+      lostEarning: false,
+      namePriorRepresentation: '',
+      priorRepresentation: false,
+      claimId: claimId?.toString() ?? '',
+    },
   });
   const selectedClaimType = form.watch('claimType');
 
   const onSubmit = (values: zod.infer<typeof IncidentSchema>) => {
-    console.log('on submit is called ');
-
     setError('');
     setSuccess('');
     startTransition(() => {
       createOrUpdateIncident(values).then((data) => {
         setError(data.error);
-        setSuccess(JSON.stringify(data.success));
+        setSuccess('IncidentCreated');
       });
     });
   };
@@ -103,6 +132,35 @@ export default function CreateNewClaim() {
             )}
             <div className='mt-[21px] flex  flex-row rounded-[12px] border border-purple bg-white p-[15px]'>
               <div className='flex-grow space-y-[5px]'>
+                <FormField
+                  control={form.control}
+                  name='date'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Date Of Incident</FormLabel>
+                      <FormControl>
+                        <div className='flex w-full flex-col'>
+                          <DatePicker
+                            className='h-12 w-full rounded-md border border-input px-3 py-2 shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50'
+                            dateFormat='yyyy-MM-dd '
+                            name='date'
+                            onChange={(date) => {
+                              field.onChange(date);
+                              setDob(date);
+                            }}
+                            placeholderText=''
+                            scrollableYearDropdown
+                            selected={dob}
+                            showYearDropdown
+                            yearDropdownItemNumber={100}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name='location'
@@ -181,7 +239,7 @@ export default function CreateNewClaim() {
                     </FormItem>
                   )}
                 />
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name='namePriorRepresentation'
                   render={({ field }) => (
@@ -193,7 +251,7 @@ export default function CreateNewClaim() {
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
                 <FormField
                   control={form.control}
                   name='priorRepresentationReason'

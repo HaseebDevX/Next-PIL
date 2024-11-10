@@ -233,7 +233,7 @@ export const IncidentSchema = zod.object({
   injured: zod.boolean(),
   id: zod.string().optional(),
   date: zod.date({ required_error: 'Date of incident is required' }),
-  time: zod.string(),
+  time: zod.date(),
   timeOfDay: zod.string(),
   location: zod.string(),
   workRelated: zod.boolean({ message: 'Work realted required' }),
@@ -251,6 +251,7 @@ export const IncidentSchema = zod.object({
   priorRepresentation: zod.boolean({ message: 'Prior representation is required' }),
   namePriorRepresentation: zod.string(),
   priorRepresentationReason: zod.string(),
+  claimId: zod.string(),
   claimType: zod.enum(
     [
       ClaimType.Car_Accident,
