@@ -1,4 +1,4 @@
-import { UserRole, ClaimType, WereYouInjured } from '@prisma/client';
+import { UserRole, ClaimType, WereYouInjured, ClaimStatus } from '@prisma/client';
 import * as zod from 'zod';
 
 export const LoginSchema = zod.object({
@@ -154,57 +154,57 @@ export const UserProfileSchema = zod.object({
   expectedGraduationYear: zod.string().optional(),
 });
 
-// export const ClaimSchema = zod.object({
-//   id: zod.number().int().optional(),
-//   name: zod.string().min(3, { message: 'Claim name is required' }),
-//   claimType: zod.enum(
-//     [
-//       ClaimType.Car_Accident,
-//       ClaimType.Workers_Compensation,
-//       ClaimType.Construction_Accident,
-//       ClaimType.Workplace_Accident,
-//       ClaimType.Motorcycle_Accident,
-//       ClaimType.Pedestrian_Accident,
-//       ClaimType.Trucking_Accident,
-//       ClaimType.Bicycle_Accident,
-//       ClaimType.Bus_Accident,
-//       ClaimType.Train_Accident,
-//       ClaimType.Burn_Injury,
-//       ClaimType.MTA_Accident,
-//       ClaimType.Ride_Share_Accident,
-//       ClaimType.Salon_Accident,
-//       ClaimType.Amusement_Park_Accident,
-//       ClaimType.Dog_Bite,
-//       ClaimType.Slip_And_Fall,
-//       ClaimType.Premise_Liability,
-//       ClaimType.Negligence_Security,
-//       ClaimType.Nursing_Home,
-//       ClaimType.Medical_Malpractice,
-//       ClaimType.Aviation_Accident,
-//       ClaimType.Birth_Injury,
-//       ClaimType.Wrongful_Death,
-//     ],
-//     { message: 'Claim Type is required' }
-//   ),
-//   claimStatus: zod
-//     .enum([
-//       ClaimStatus.PENDING_INFORMATION,
-//       ClaimStatus.UNDER_REVIEW,
-//       ClaimStatus.ACCEPTED,
-//       ClaimStatus.INVESTIGATION,
-//       ClaimStatus.REJECTED,
-//       ClaimStatus.CLOSED,
-//     ])
-//     .optional()
-//     .nullable(),
-//   assignedClaimSpecialist: zod.string().optional().nullable(),
-//   claimSpecialistPhone: zod.string().optional().nullable(),
-//   claimSpecialistEmail: zod.string().email().optional().nullable(),
-//   assignedClaimLink: zod.string().optional().nullable(),
-//   userId: zod.string({
-//     required_error: 'User cannot create account.',
-//   }),
-// });
+export const ClaimSchema = zod.object({
+  id: zod.number().int().optional(),
+  name: zod.string().min(3, { message: 'Claim name is required' }),
+  claimType: zod.enum(
+    [
+      ClaimType.Car_Accident,
+      ClaimType.Workers_Compensation,
+      ClaimType.Construction_Accident,
+      ClaimType.Workplace_Accident,
+      ClaimType.Motorcycle_Accident,
+      ClaimType.Pedestrian_Accident,
+      ClaimType.Trucking_Accident,
+      ClaimType.Bicycle_Accident,
+      ClaimType.Bus_Accident,
+      ClaimType.Train_Accident,
+      ClaimType.Burn_Injury,
+      ClaimType.MTA_Accident,
+      ClaimType.Ride_Share_Accident,
+      ClaimType.Salon_Accident,
+      ClaimType.Amusement_Park_Accident,
+      ClaimType.Dog_Bite,
+      ClaimType.Slip_And_Fall,
+      ClaimType.Premise_Liability,
+      ClaimType.Negligence_Security,
+      ClaimType.Nursing_Home,
+      ClaimType.Medical_Malpractice,
+      ClaimType.Aviation_Accident,
+      ClaimType.Birth_Injury,
+      ClaimType.Wrongful_Death,
+    ],
+    { message: 'Claim Type is required' }
+  ),
+  claimStatus: zod
+    .enum([
+      ClaimStatus.PENDING_INFORMATION,
+      ClaimStatus.UNDER_REVIEW,
+      // ClaimStatus.ACCEPTED,
+      ClaimStatus.INVESTIGATION,
+      // ClaimStatus.REJECTED,
+      // ClaimStatus.CLOSED,
+    ])
+    .optional()
+    .nullable(),
+  assignedClaimSpecialist: zod.string().optional().nullable(),
+  claimSpecialistPhone: zod.string().optional().nullable(),
+  claimSpecialistEmail: zod.string().email().optional().nullable(),
+  assignedClaimLink: zod.string().optional().nullable(),
+  userId: zod.string({
+    required_error: 'User cannot create account.',
+  }),
+});
 
 // id                        String   @id @default(uuid())
 // date                      DateTime @map("Date of Accident")

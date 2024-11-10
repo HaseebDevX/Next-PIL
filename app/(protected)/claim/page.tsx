@@ -24,7 +24,7 @@ export default async function DashboardPage() {
   // } else {
   return (
     <div className='flex flex-col'>
-      <ClaimListCreate user={existingUser} />
+      <ClaimListCreate user={existingUser} userClaims={getClaimByUserIdResult} />
     </div>
   );
   // }

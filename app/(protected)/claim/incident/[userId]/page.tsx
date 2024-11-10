@@ -12,20 +12,19 @@ import ThemeChip from '@/components/ui/chip';
 import { SimpleText } from '@/components/claim/simpleText';
 import DatePicker from 'react-datepicker';
 import { Input } from '@/components/ui/input';
-import ThemeRadioGroup from '@/components/ui/radio-group';
+import ThemeRadioGroup from '@/components/ui/radio-group/radio-group';
 import { Button } from '@/components/ui/button';
 import { FormError } from '@/components/form-messages/FormError';
 import { FormSuccess } from '@/components/form-messages/FormSuccess';
 import { createOrUpdateIncident } from '@/actions/claim-incident-create-update';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import 'react-datepicker/dist/react-datepicker.css';
 import { createClaim } from '@/actions/claim-create';
+import RadioGroupDemo from '@/components/ui/radio-group/radio-group';
 export default function CreateNewClaim() {
   const params = useParams();
   const userId = params?.userId;
-
-  const [claimId, setClaimId] = useState<string | undefined>('');
-
+  const router = useRouter();
   const [error, setError] = useState<string | undefined>('');
   const [success, setSuccess] = useState<string | undefined>('');
   const [dateCreated, setDateCreated] = useState<string>();
@@ -34,19 +33,19 @@ export default function CreateNewClaim() {
     resolver: zodResolver(IncidentSchema),
     defaultValues: {
       date: new Date(),
-      location: '',
-      description: '',
-      policeOfficer: '',
-      reportNumber: '',
-      amountLoss: '',
-      timeLoss: '',
-      priorRepresentationReason: '',
+      // location: '',
+      // description: '',
+      // policeOfficer: '',
+      // reportNumber: '',
+      // amountLoss: '',
+      // timeLoss: '',
+      // priorRepresentationReason: '',
 
       injured: false,
       id: undefined,
       time: new Date(),
       timeOfDay: 'PM',
-      workRelated: false,
+      workRelated: true,
       policeReportCompleted: false,
       policeStation: '',
       reportCompleted: false,
@@ -55,21 +54,30 @@ export default function CreateNewClaim() {
       lostEarning: false,
       namePriorRepresentation: '',
       priorRepresentation: false,
-      claimId: claimId?.toString() ?? '',
+      claimId: '',
     },
   });
   const selectedClaimType = form.watch('claimType');
 
   useEffect(() => {
-    createNewClaim();
+    if (selectedClaimType) {
+      createNewClaim();
+    }
   }, [selectedClaimType]);
   const onSubmit = (values: zod.infer<typeof IncidentSchema>) => {
+    console.log(values);
+
     setError('');
     setSuccess('');
     startTransition(() => {
       createOrUpdateIncident(values).then((data) => {
+        console.log(data);
+
         setError(data.error);
-        setSuccess('IncidentCreated');
+        if (data?.success) {
+          setSuccess('Incident Created');
+          router.push('/claim');
+        }
       });
     });
   };
@@ -79,10 +87,13 @@ export default function CreateNewClaim() {
       relationship: Relationship.Other,
       type: selectedClaimType,
     };
+    console.log(payload);
 
     await createClaim(payload).then((claim) => {
+      console.log(claim);
+
       if (claim.success) {
-        setClaimId(claim.success.id);
+        form.setValue('claimId', claim.success.id);
       } else {
         console.log("Can't create claim");
       }
@@ -97,10 +108,19 @@ export default function CreateNewClaim() {
     const year = date.getFullYear();
     return `${day}-${month}-${year}`;
   }
+  const options = [
+    { label: 'Yes', value: 'Yes' },
+    { label: 'No', value: 'No' },
+  ];
+  const [selectedOption, setSelectedOption] = useState('default');
+
+  const handleRadioChange = (value: string) => {
+    setSelectedOption(value);
+    console.log('Selected:', value);
+  };
   return (
     <div className='flex w-full flex-row justify-center  px-[10px] pt-2.5 md:px-0  md:pt-10 lg:px-0 xl:px-0'>
       <div className='w-full md:w-[499px]'>
-        {' '}
         <Form {...form}>
           <form className='space-y-4' onSubmit={form.handleSubmit(onSubmit)}>
             {!selectedClaimType && (
@@ -150,6 +170,7 @@ export default function CreateNewClaim() {
                 </div>
               </div>
             )}
+
             <div className='mt-[21px] flex  flex-row rounded-[12px] border border-purple bg-white p-[15px]'>
               <div className='flex-grow space-y-[5px]'>
                 <CardHeading title='Incident' />
@@ -183,6 +204,28 @@ export default function CreateNewClaim() {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name='workRelated'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Were you at work at the time of the accident?</FormLabel>
+                      <FormControl>
+                        <RadioGroupDemo
+                          options={options}
+                          vertical={false}
+                          name='workRelated'
+                          defaultValue={field.value.toString()}
+                          onChange={(val: string) => {
+                            console.log(val);
+                            field.onChange(val === 'Yes');
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}
@@ -210,14 +253,97 @@ export default function CreateNewClaim() {
                     </FormItem>
                   )}
                 />
+
+                {/* <FormField
+                  control={form.control}
+                  name='policeReportCompleted'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Was a Police Report Filed?</FormLabel>
+                      <FormControl>
+                        <RadioGroupDemo
+                          options={options}
+                          vertical={false}
+                          name='policeReportCompleted'
+                          defaultValue={field.value.toString()}
+                          onChange={(val: string) => {
+                            console.log(val);
+
+                            field.onChange(val === 'Yes');
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                /> */}
+                <FormField
+                  control={form.control}
+                  name='policeReportCompleted'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Police report required?</FormLabel>
+                      <FormControl>
+                        <RadioGroupDemo
+                          options={options}
+                          vertical={false}
+                          name='policeReportCompleted'
+                          defaultValue={field.value.toString()}
+                          onChange={(val: string) => {
+                            console.log(val);
+
+                            field.onChange(val === 'Yes');
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='policeStation'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Police Station/Precinct</FormLabel>
+                      <FormControl>
+                        <Input {...field} disabled={isPending} placeholder='Enter police station...' />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name='policeOfficer'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Police officer</FormLabel>
+                      <FormLabel>Officer Name and Description</FormLabel>
                       <FormControl>
                         <Input {...field} disabled={isPending} placeholder='Enter police officer...' />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='reportCompleted'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Was an Accident Report or Complaint Report Filed?</FormLabel>
+                      <FormControl>
+                        <RadioGroupDemo
+                          options={options}
+                          vertical={false}
+                          name='reportCompleted'
+                          defaultValue={field.value.toString()}
+                          onChange={(val: string) => {
+                            console.log(val);
+
+                            field.onChange(val === 'Yes');
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -228,9 +354,33 @@ export default function CreateNewClaim() {
                   name='reportNumber'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Report number</FormLabel>
+                      <FormLabel>Accident/Complaint Report Number</FormLabel>
                       <FormControl>
                         <Input {...field} disabled={isPending} placeholder='Enter report number' />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='lostEarning'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Lost earning is required?</FormLabel>
+                      <FormControl>
+                        <RadioGroupDemo
+                          options={options}
+                          vertical={false}
+                          name='lostEarning'
+                          defaultValue={field.value.toString()}
+                          onChange={(val: string) => {
+                            console.log(val);
+
+                            field.onChange(val === 'Yes');
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -241,7 +391,7 @@ export default function CreateNewClaim() {
                   name='amountLoss'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Amount loss</FormLabel>
+                      <FormLabel>Approximate Loss of Earning</FormLabel>
                       <FormControl>
                         <Input {...field} disabled={isPending} placeholder='Enter amount loss' />
                       </FormControl>
@@ -254,7 +404,7 @@ export default function CreateNewClaim() {
                   name='timeLoss'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Time loss</FormLabel>
+                      <FormLabel>Approximate Missed Time from School? (If in school)</FormLabel>
                       <FormControl>
                         <Input {...field} disabled={isPending} placeholder='Enter time loss' />
                       </FormControl>
@@ -262,7 +412,29 @@ export default function CreateNewClaim() {
                     </FormItem>
                   )}
                 />
-                {/* <FormField
+                <FormField
+                  control={form.control}
+                  name='priorRepresentation'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Prior representation is required?</FormLabel>
+                      <FormControl>
+                        <RadioGroupDemo
+                          options={options}
+                          vertical={false}
+                          name='priorRepresentation'
+                          defaultValue={field.value.toString()}
+                          onChange={(val: string) => {
+                            console.log(val);
+                            field.onChange(val === 'Yes');
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
                   control={form.control}
                   name='namePriorRepresentation'
                   render={({ field }) => (
@@ -274,7 +446,7 @@ export default function CreateNewClaim() {
                       <FormMessage />
                     </FormItem>
                   )}
-                /> */}
+                />
                 <FormField
                   control={form.control}
                   name='priorRepresentationReason'
@@ -291,7 +463,8 @@ export default function CreateNewClaim() {
                 <FormError message={error} />
                 <FormSuccess message={success} />
                 <div className='pt-5'></div>
-                <Button className=' my-4 w-full p-6' disabled={isPending} type='submit'>
+                {/* <Button className=' my-4 w-full p-6' disabled={isPending} type='submit'> */}
+                <Button className=' ' disabled={isPending} type='submit'>
                   Submit
                 </Button>
               </div>
