@@ -12,20 +12,20 @@ export default async function DashboardPage() {
   // const existProfile: any = await getProfileByUserId(userId);
   const existingUser = await getUserById(userId);
   const getClaimByUserIdResult: any = await getClaimByUserId(userId);
-  if (getClaimByUserIdResult?.length) {
-    return (
-      <div>
-        {getClaimByUserIdResult.map((claim: Zod.infer<typeof ClaimSchema>) => (
-          <ClaimList claim={claim} key={claim.id} />
-        ))}
-        <ClaimListCreate user={existingUser} />
-      </div>
-    );
-  } else {
-    return (
-      <div className='flex flex-col'>
-        <ClaimListCreate user={existingUser} />
-      </div>
-    );
-  }
+  // if (getClaimByUserIdResult?.length) {
+  //   return (
+  //     <div>
+  //       {getClaimByUserIdResult.map((claim: Zod.infer<typeof ClaimSchema>) => (
+  //         <ClaimList claim={claim} key={claim.id} />
+  //       ))}
+  //       <ClaimListCreate user={existingUser} />
+  //     </div>
+  //   );
+  // } else {
+  return (
+    <div className='flex flex-col'>
+      <ClaimListCreate user={existingUser} />
+    </div>
+  );
+  // }
 }

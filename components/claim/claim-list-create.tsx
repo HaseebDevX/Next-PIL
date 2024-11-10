@@ -6,15 +6,10 @@ import Image from 'next/image';
 import arrowRight from '@/public/icons/arrow-right-black.svg';
 import btnEdit from '@/public/icons/btn-edit.svg';
 
-// import { createClaim } from '@/actions/claim-create';
 import HalfCircleProgressBar from '../ui/half-progress-bar';
 import ThemeChip from '../ui/chip';
-import { currentSessionUser } from '@/lib/auth-utils';
-import { getUserById } from '@/data/user';
-import Link from 'next/link';
 import { CardHeading } from './cardHeading';
 import { SimpleText } from './simpleText';
-import { createClaim } from '@/actions/claim-create';
 
 const ClaimListCreate = (prop: { user: any }) => {
   const [progress, setProgress] = useState(15);
@@ -27,13 +22,6 @@ const ClaimListCreate = (prop: { user: any }) => {
     console.log(prop.user);
   };
   const router = useRouter();
-  const createNewClaim = async () => {
-    await createClaim(prop.user.id).then((claim) => {
-      if (claim.success) {
-        router.push('claim/' + claim.success.id);
-      }
-    });
-  };
 
   return (
     <>
@@ -99,14 +87,12 @@ const ClaimListCreate = (prop: { user: any }) => {
             </div>
             <div
               onClick={() => {
-                createNewClaim();
+                router.push('claim/incident/' + prop.user.id);
               }}
-              // href='/claim/create'
               className='mt-[21px] flex flex-row rounded-[12px] border border-purple bg-white p-[15px]  '
             >
               <div className='flex-grow space-y-[5px]'>
                 <CardHeading title='Create New Claim' />
-
                 <SimpleText title="Let's start your claim process" />
               </div>
               <Image alt='Paininjurylaw' className='' height={24} priority src={arrowRight} width={24} />

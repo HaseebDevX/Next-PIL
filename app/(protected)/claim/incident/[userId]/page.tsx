@@ -1,10 +1,10 @@
 'use client';
 import { IncidentSchema } from '@/schemas';
-import React, { useState, useTransition } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod';
-import { ClaimType } from '@prisma/client';
+import { ClaimType, Relationship } from '@prisma/client';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CardHeading } from '@/components/claim/cardHeading';
@@ -19,11 +19,12 @@ import { FormSuccess } from '@/components/form-messages/FormSuccess';
 import { createOrUpdateIncident } from '@/actions/claim-incident-create-update';
 import { useParams } from 'next/navigation';
 import 'react-datepicker/dist/react-datepicker.css';
+import { createClaim } from '@/actions/claim-create';
 export default function CreateNewClaim() {
   const params = useParams();
-  const claimId = params?.id;
+  const userId = params?.userId;
 
-  // const claimId = searchParams.get();
+  const [claimId, setClaimId] = useState<string | undefined>('');
 
   const [error, setError] = useState<string | undefined>('');
   const [success, setSuccess] = useState<string | undefined>('');
@@ -59,6 +60,9 @@ export default function CreateNewClaim() {
   });
   const selectedClaimType = form.watch('claimType');
 
+  useEffect(() => {
+    createNewClaim();
+  }, [selectedClaimType]);
   const onSubmit = (values: zod.infer<typeof IncidentSchema>) => {
     setError('');
     setSuccess('');
@@ -69,6 +73,22 @@ export default function CreateNewClaim() {
       });
     });
   };
+  const createNewClaim = async () => {
+    const payload = {
+      userId: userId,
+      relationship: Relationship.Other,
+      type: selectedClaimType,
+    };
+
+    await createClaim(payload).then((claim) => {
+      if (claim.success) {
+        setClaimId(claim.success.id);
+      } else {
+        console.log("Can't create claim");
+      }
+    });
+  };
+
   const [dob, setDob] = useState<Date | null>(new Date());
 
   function formatDate(date: Date): string {
@@ -132,6 +152,9 @@ export default function CreateNewClaim() {
             )}
             <div className='mt-[21px] flex  flex-row rounded-[12px] border border-purple bg-white p-[15px]'>
               <div className='flex-grow space-y-[5px]'>
+                <CardHeading title='Incident' />
+                <div className='pb-5' />
+
                 <FormField
                   control={form.control}
                   name='date'
