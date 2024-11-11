@@ -137,6 +137,20 @@ enum DefendantRole {
   Other
 }
 
+enum MedCare {
+  Medicare
+  Medicaid
+  Unemployment
+  Social_Security_Benefits
+}
+
+enum QuestionType {
+  TEXT
+  NUMBER
+  DATE
+  YESNO
+}
+
 model User {
   id                        String                 @id @default(cuid())
   firstname                 String
@@ -226,21 +240,127 @@ model TwoFactorConfirmation {
 }
 
 model Claim {
-  id                String       @id @default(uuid())
-  name              String?
-  type              ClaimType?   @map("Claim Type")
-  status            ClaimStatus? @map("Status")
-  injured           Boolean?     @map("Were you injured?")
-  relationship      Relationship @map("Relationship")
-  otherRelationship String?      @map("Other Relationship")
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
-  // Relationship
-  user              User         @relation(fields: [userId], references: [id])
-  userId            String
+  id                    String        @id @default(uuid())
+  type                  ClaimType?    @map("Claim Type")
+  status                ClaimStatus?  @default(PENDING_INFORMATION) @map("Status")
+  injured               Boolean?      @map("Were you injured?")
+  relationship          Relationship? @map("Relationship")
+  otherRelationship     String?       @map("Other Relationship")
+  healthInsurance       Boolean?      @map("Do you have health insurance?")
+  healthInsuranceNumber String?       @map("Health Insurance Number")
+  receiveMedicare       MedCare?      @map("Do you currently receive?")
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
 
-  incident  Incident?
-  witnessId Witness?
+  // Relationship
+  user                    User                     @relation(fields: [userId], references: [id])
+  userId                  String
+  incident                Incident?
+  witness                 Witness?
+  client                  Client?
+  injuredParty            InjuredParty?
+  treatmentAndInjury      TreatmentAndInjury?
+  healthInsuranceProvider HealthInsuranceProvider?
+  defendant               Defendant?
+  questionnaire           Questionnaire?
+}
+
+model Questionnaire {
+  id      String @id @default(uuid())
+  claim   Claim  @relation(fields: [claimId], references: [id])
+  claimId String @unique
+
+  // Relationship
+  question QuestionAnswer[]
+}
+
+model QuestionAnswer {
+  id String @id @default(uuid())
+
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId String   @map("Question ID")
+  answer     String?  @map("Answer")
+
+  Questionnaire   Questionnaire? @relation(fields: [questionnaireId], references: [id])
+  questionnaireId String?
+}
+
+model Question {
+  id        String       @id @default(uuid())
+  claimType ClaimType?   @map("Claim Type")
+  name      String       @map("Question")
+  type      QuestionType @map("Question type")
+  choices   String?      @map("Choices")
+  enable    Boolean      @default(false) @map("Active")
+
+  QuestionAnswer QuestionAnswer[]
+}
+
+model Defendant {
+  id      String @id @default(uuid())
+  claim   Claim  @relation(fields: [claimId], references: [id])
+  claimId String @unique
+
+  defendantDetails DefendantDetails[]
+
+  @@index([claimId])
+}
+
+model DefendantDetails {
+  id                      String         @id @default(uuid())
+  defendantRole           DefendantRole? @map("Defendant Role")
+  insurancePolicyNumber   String?        @map("Defendant Policy Number")
+  defendantLocation       String?        @map("Defendant Location")
+  vechicleMake            String?        @map("Vehicle Make")
+  vechicleModel           String?        @map("Vehicle Model")
+  vechicleYear            String?        @map("Vehicle Year")
+  vechicleColor           String?        @map("Vehicle Color")
+  vechiclePlate           String?        @map("Vehicle Plate Number")
+  vechicleRegisteredState String?        @map("Vehicle Registered State")
+
+  defendant   Defendant @relation(fields: [defendantId], references: [id])
+  defendantId String
+  role        Role      @relation(fields: [roleId], references: [id]) //Role=Defendant and //  Role= Insurance Carrier
+  roleId      String
+
+  @@index([defendantId])
+}
+
+model HealthInsuranceProvider {
+  id      String @id @default(uuid())
+  claim   Claim  @relation(fields: [claimId], references: [id])
+  claimId String @unique
+  role    Role   @relation(fields: [roleId], references: [id])
+  roleId  String
+}
+
+model TreatmentAndInjury {
+  id       String @id @default(uuid())
+  claim    Claim  @relation(fields: [claimId], references: [id])
+  claimId  String @unique
+  injury   Injury @relation(fields: [injuryId], references: [id])
+  injuryId String @unique
+}
+
+model Injury {
+  id                 String               @id @default(uuid())
+  injuryLocation     InjuryPoint          @map("Injury Location")
+  injury             InjuryType           @map("Injury")
+  injuryLocationSide InjurySide           @map("Injury Location Side")
+  treatmentAndInjury TreatmentAndInjury[]
+  treatment          Treatment            @relation(fields: [treatmentId], references: [id])
+  treatmentId        String
+}
+
+model Treatment {
+  id            String    @id @default(uuid())
+  doctorName    String?   @map("Doctor Name")
+  admission     DateTime? @map("Date of Admission")
+  discharge     DateTime? @map("Date of Discharge")
+  nextScheduled DateTime? @map("Next Scheduled Date")
+  injury        Injury[]
+  role          Role      @relation(fields: [roleId], references: [id])
+  roleId        String
 }
 
 model Incident {
@@ -256,8 +376,8 @@ model Incident {
   policeOfficer             String?  @map("Officer Name and Description")
   reportCompleted           Boolean  @map("Was an Accident Report or Complaint Report Filed")
   reportNumber              String?  @map("Accident/Complaint Report Number")
-  supportingDocument        Boolean  @map("Picture Taken?")
-  supportingDocumentUpload  String?  @map("Upload (if yes)")
+  supportingDocument        Boolean  @map("Picture Taken?")//Ask for KB
+  supportingDocumentUpload  String?  @map("Upload (if yes)")//Ask for KB
   lostEarning               Boolean  @map("Missed time from work or school?")
   amountLoss                String?  @map("Approximate Loss of Earning")
   timeLoss                  String?  @map("Approximate Missed Time from School? (If in school)")
@@ -289,15 +409,42 @@ model WitnessDetails {
   @@index([witnessId])
 }
 
+model Client {
+  id      String @id @default(uuid())
+  claim   Claim  @relation(fields: [claimId], references: [id])
+  claimId String @unique
+
+  role   Role   @relation(fields: [roleId], references: [id])
+  roleId String
+
+  @@index([claimId])
+}
+
+model InjuredParty {
+  id      String @id @default(uuid())
+  claim   Claim  @relation(fields: [claimId], references: [id])
+  claimId String @unique
+
+  role   Role   @relation(fields: [roleId], references: [id])
+  roleId String
+
+  @@index([claimId])
+}
+
 model Role {
   id String @id @default(uuid())
 
   // Relationship
-  account        Account          @relation(fields: [accountId], references: [id])
-  accountId      String
-  roletype       RoleType         @relation(fields: [roletypeId], references: [id])
-  roletypeId     String
-  WitnessDetails WitnessDetails[]
+  account                 Account                   @relation(fields: [accountId], references: [id])
+  accountId               String
+  roletype                RoleType                  @relation(fields: [roletypeId], references: [id])
+  roletypeId              String
+  witnessDetails          WitnessDetails[]
+  client                  Client[]
+  injuredParty            InjuredParty[]
+  treatment               Treatment[]
+  healthInsuranceProvider HealthInsuranceProvider[]
+  defendantDetails        DefendantDetails[]
 }
 
 model RoleType {
@@ -313,23 +460,22 @@ model RoleType {
 
 model Account {
   id                       String  @id @default(uuid())
-  firstName                String  @map("First Name")
-  lastName                 String  @map("Last Name")
-  email                    String  @map("Email Address")
-  phone                    String  @map("Phone")
-  secondPhone              String? @map("Secondary Phone")
-  faxNumber                String? @map("Fax Number")
-  mailingAddressStreet     String  @map("Mailing Address Street")
+  firstname                String? @map("First Name")
+  lastname                 String? @map("Last Name")
+  email                    String? @map("Email Address")
+  phone                    String? @map("Phone")
+  phone2                   String? @map("Secondary Phone")
+  fax                      String? @map("Fax Number")
+  mailingAddress           String? @map("Mailing Address Street")
   mailingAddressBuilding   String? @map("Mailing Address Building")
-  mailingAddressCity       String  @map("Mailing City")
-  mailingAddressState      String  @map("Mailing State")
-  mailingAddressPostalCode String  @map("Mailing Zip Code")
-  billingAddressStreet     String  @map("Billing Address Street")
+  mailingCity              String? @map("Mailing City")
+  mailingState             String? @map("Mailing State")
+  mailingZipCode           String? @map("Mailing Zip Code")
+  billingAddressStreet     String? @map("Billing Address Street")
   billingAddressBuilding   String? @map("Billing Address Building")
   billingAddressCity       String? @map("Billing Address City")
   billingAddressState      String? @map("Billing Address State")
   billingAddressPostalCode String? @map("Billing Zip Code")
-  // Witness                  WitnessDetails[]
 
   // Relationship
   Role Role[]
