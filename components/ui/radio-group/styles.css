@@ -10,6 +10,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding-top: 5px;
 }
 
 .RadioGroupItem {
@@ -17,13 +18,13 @@ button {
   width: 24px;
   height: 24px;
   border-radius: 100%;
-  box-shadow: 0 2px 10px var(--black-a7);
+  box-shadow: 0 2px 5px gray;
 }
 .RadioGroupItem:hover {
   background-color: var(--violet-3);
 }
 .RadioGroupItem:focus {
-  box-shadow: 0 0 0 2px black;
+  box-shadow: 0 0 0 1px gray;
 }
 
 .RadioGroupIndicator {
