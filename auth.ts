@@ -80,7 +80,7 @@ export const {
       const existingAccount = await getAccountByUserId(existingUser.id);
 
       token.isOauth = !!existingAccount;
-      token.name = existingUser.name;
+      // token.name = existingUser.name;
       token.email = existingUser.email;
       token.role = existingUser.role;
       token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;

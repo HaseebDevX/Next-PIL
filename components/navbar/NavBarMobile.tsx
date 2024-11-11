@@ -1,11 +1,12 @@
 'use client';
 import Image from 'next/image';
+import { useState } from 'react';
 
 import homeIcon from '@/public/icons/home.svg';
 import claimIcon from '@/public/icons/claim.svg';
 import documentIcon from '@/public/icons/document.svg';
 import notifyIcon from '@/public/icons/notify.svg';
-import { useState } from 'react';
+
 export function NavbarMobile() {
   const [isActive, setIsActive] = useState<number>(1);
   const MenuItem = (prop: { title: string; active: boolean; icon: string; onClick: () => void }) => {
@@ -20,36 +21,36 @@ export function NavbarMobile() {
   return (
     <nav className=' flex flex-row justify-evenly space-y-0.5 bg-purple  pt-[17px]  '>
       <MenuItem
-        title='Home'
         active={isActive === 1}
         icon={homeIcon}
         onClick={() => {
           setIsActive(1);
         }}
+        title='Home'
       />
       <MenuItem
-        title='Claim'
         active={isActive === 2}
         icon={claimIcon}
         onClick={() => {
           setIsActive(2);
         }}
+        title='Claim'
       />
       <MenuItem
-        title='Document'
         active={isActive === 3}
         icon={documentIcon}
         onClick={() => {
           setIsActive(3);
         }}
+        title='Document'
       />
       <MenuItem
-        title='Notify'
         active={isActive === 4}
         icon={notifyIcon}
         onClick={() => {
           setIsActive(4);
         }}
+        title='Notify'
       />
     </nav>
   );

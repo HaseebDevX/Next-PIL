@@ -1,28 +1,29 @@
 'use client';
-import { ClaimSchema, IncidentSchema } from '@/schemas';
 import React, { useEffect, useRef, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod';
 import { ClaimType, Relationship } from '@prisma/client';
+import DatePicker from 'react-datepicker';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+
+import { ClaimSchema, IncidentSchema } from '@/schemas';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CardHeading } from '@/components/claim/cardHeading';
 import ThemeChip from '@/components/ui/chip';
 import { SimpleText } from '@/components/claim/simpleText';
-import DatePicker from 'react-datepicker';
 import { Input } from '@/components/ui/input';
-import ThemeRadioGroup from '@/components/ui/radio-group/radio-group';
 import { Button } from '@/components/ui/button';
 import { FormError } from '@/components/form-messages/FormError';
 import { FormSuccess } from '@/components/form-messages/FormSuccess';
 import { createOrUpdateIncident } from '@/actions/claim-incident-create-update';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import 'react-datepicker/dist/react-datepicker.css';
 import { createClaim } from '@/actions/claim-create';
 import RadioGroupDemo from '@/components/ui/radio-group/radio-group';
 import { getIncidentByClaimId } from '@/data/incident';
 import { formateToDDMMYY } from '@/lib/formate-date';
+
 export default function CreateNewClaim() {
   const searchParams = useSearchParams();
   const claimIdForUpdate = searchParams.get('claimId');
@@ -73,13 +74,11 @@ export default function CreateNewClaim() {
   const setIncidentData = async (id: string) => {
     formDataLoaded.current = true;
     let claimToEditString = sessionStorage.getItem('claimToEdit');
-    const claimToEdit:zod.infer<typeof ClaimSchema> = JSON.parse(claimToEditString || '');
-  
+    const claimToEdit: zod.infer<typeof ClaimSchema> = JSON.parse(claimToEditString || '');
 
     form.setValue('claimType', claimToEdit.type);
     const incidentToEdit = claimToEdit?.incident || {};
     Object.keys(incidentToEdit).forEach((key) => {
-      
       if (key === 'date') {
         const tempDate = new Date(incidentToEdit[key as keyof typeof incidentToEdit]);
         setDateCreated(formateToDDMMYY(tempDate));
@@ -97,9 +96,8 @@ export default function CreateNewClaim() {
     form.setValue('time', new Date());
   };
   const onError = (errors: any) => {
-    console.log(form.getValues());
-
-    console.log('Form errors:', errors);
+    // console.log(form.getValues());
+    // console.log('Form errors:', errors);
   };
   useEffect(() => {
     if (selectedClaimType && !claimIdForUpdate) {
@@ -107,13 +105,13 @@ export default function CreateNewClaim() {
     }
   }, [selectedClaimType]);
   const onSubmit = (values: zod.infer<typeof IncidentSchema>) => {
-    console.log(values);
+    // console.log(values);
 
     setError('');
     setSuccess('');
     startTransition(() => {
       createOrUpdateIncident(values).then((data) => {
-        console.log(data);
+        // console.log(data);
 
         setError(data.error);
         if (data?.success) {
@@ -132,15 +130,15 @@ export default function CreateNewClaim() {
       relationship: Relationship.Other,
       type: selectedClaimType,
     };
-    console.log(payload);
+    // console.log(payload);
 
     await createClaim(payload).then((claim) => {
-      console.log(claim);
+      // console.log(claim);
 
       if (claim.success) {
         form.setValue('claimId', claim.success.id);
       } else {
-        console.log("Can't create claim");
+        // console.log("Can't create claim");
       }
     });
   };
@@ -157,7 +155,6 @@ export default function CreateNewClaim() {
     { label: 'Yes', value: 'Yes' },
     { label: 'No', value: 'No' },
   ];
-  
 
   return (
     <div className='flex w-full flex-row justify-center  px-[10px] pt-2.5 md:px-0  md:pt-10 lg:px-0 xl:px-0'>
@@ -202,7 +199,7 @@ export default function CreateNewClaim() {
                 <div className='flex-grow space-y-[5px]'>
                   <div className='flex flex-row space-x-[5px] '>
                     <CardHeading title={selectedClaimType.replaceAll('_', ' ')} />
-                    <ThemeChip title='Pending Info' color='bg-themeRed' />
+                    <ThemeChip color='bg-themeRed' title='Pending Info' />
                   </div>
                   <div className='flex flex-row space-x-2.5 '>
                     <SimpleText title='Date created:' />
@@ -254,14 +251,14 @@ export default function CreateNewClaim() {
                         <FormLabel>Were you at work at the time of the accident?</FormLabel>
                         <FormControl>
                           <RadioGroupDemo
-                            options={options}
-                            vertical={false}
-                            name='workRelated'
                             defaultValue={field.value ? 'Yes' : 'No'}
+                            name='workRelated'
                             onChange={(val: string) => {
-                              console.log(val);
+                              // console.log(val);
                               field.onChange(val === 'Yes');
                             }}
+                            options={options}
+                            vertical={false}
                           />
                         </FormControl>
                         <FormMessage />
@@ -304,15 +301,15 @@ export default function CreateNewClaim() {
                         <FormLabel>Was a Police Report Filed?</FormLabel>
                         <FormControl>
                           <RadioGroupDemo
-                            options={options}
-                            vertical={false}
-                            name='policeReportCompleted'
                             defaultValue={field.value ? 'Yes' : 'No'}
+                            name='policeReportCompleted'
                             onChange={(val: string) => {
-                              console.log(val);
+                              // console.log(val);
 
                               field.onChange(val === 'Yes');
                             }}
+                            options={options}
+                            vertical={false}
                           />
                         </FormControl>
                         <FormMessage />
@@ -353,15 +350,15 @@ export default function CreateNewClaim() {
                         <FormLabel>Was an Accident Report or Complaint Report Filed?</FormLabel>
                         <FormControl>
                           <RadioGroupDemo
-                            options={options}
-                            vertical={false}
-                            name='reportCompleted'
                             defaultValue={field.value ? 'Yes' : 'No'}
+                            name='reportCompleted'
                             onChange={(val: string) => {
-                              console.log(val);
+                              // console.log(val);
 
                               field.onChange(val === 'Yes');
                             }}
+                            options={options}
+                            vertical={false}
                           />
                         </FormControl>
                         <FormMessage />
@@ -390,15 +387,15 @@ export default function CreateNewClaim() {
                         <FormLabel>Lost earning is required?</FormLabel>
                         <FormControl>
                           <RadioGroupDemo
-                            options={options}
-                            vertical={false}
-                            name='lostEarning'
                             defaultValue={field.value ? 'Yes' : 'No'}
+                            name='lostEarning'
                             onChange={(val: string) => {
-                              console.log(val);
+                              // console.log(val);
 
                               field.onChange(val === 'Yes');
                             }}
+                            options={options}
+                            vertical={false}
                           />
                         </FormControl>
                         <FormMessage />
@@ -439,14 +436,14 @@ export default function CreateNewClaim() {
                         <FormLabel>Prior representation is required?</FormLabel>
                         <FormControl>
                           <RadioGroupDemo
-                            options={options}
-                            vertical={false}
-                            name='priorRepresentation'
                             defaultValue={field.value ? 'Yes' : 'No'}
+                            name='priorRepresentation'
                             onChange={(val: string) => {
-                              console.log(val);
+                              // console.log(val);
                               field.onChange(val === 'Yes');
                             }}
+                            options={options}
+                            vertical={false}
                           />
                         </FormControl>
                         <FormMessage />
@@ -481,7 +478,7 @@ export default function CreateNewClaim() {
                   />
                   <FormError message={error} />
                   <FormSuccess message={success} />
-                  <div className='pt-5'></div>
+                  <div className='pt-5' />
                   {/* <Button className=' my-4 w-full p-6' disabled={isPending} type='submit'> */}
                   <Button className=' ' disabled={isPending} type='submit'>
                     Submit

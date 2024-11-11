@@ -17,23 +17,23 @@ const HalfCircleProgressBar: React.FC<ProgressBarProps> = ({ progress = 0 }) => 
     <div className='relative flex items-center justify-center'>
       <svg height={height} width={width}  xmlns='http://www.w3.org/2000/svg'>
         {/* Background Circle */}
-        <circle cx={width / 2} cy={height} r={radius} className='stroke-white' strokeWidth='5' fill='none' />
+        <circle className='stroke-white' cx={width / 2}  cy={height} fill='none' r={radius}  strokeWidth='5'  />
 
         {/* Progress Circle */}
         <circle
+          className='stroke-themeLightPurple2'
           cx={width / 2}
           cy={height}
-          r={radius}
-          className='stroke-themeLightPurple2'
-          strokeWidth='5'
           fill='none'
+          r={radius}
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
           strokeLinecap='round'
-          transform={`rotate(-180 ${width / 2} ${height})`} // Start the progress from the bottom center
+          strokeWidth='5'
           style={{
             transition: 'stroke-dashoffset 0.3s ease',
           }}
+          transform={`rotate(-180 ${width / 2} ${height})`} // Start the progress from the bottom center
         />
       </svg>
       <div className='absolute pt-[80px] font-wicklowRegular text-[64px] text-white'>{progress}%</div>

@@ -9,14 +9,14 @@ export const createOrUpdateClaim = async (values: zod.infer<typeof ClaimSchema>)
 
   if (!validatedFields.success) return { error: 'Invalid fields' };
 
-  const { id, name, claimType, userId } = validatedFields.data;
+  const { id, name, type, userId } = validatedFields.data;
 
   if (id) {
     const claimDataUpdated = await db.claim.update({
-      where: { id: id },
+      where: { id: id.toString() },
       data: {
-        name,
-        claimType,
+        // name,
+        type,
         userId,
       },
     });
@@ -25,8 +25,8 @@ export const createOrUpdateClaim = async (values: zod.infer<typeof ClaimSchema>)
   } else {
     const claimDataCreated = await db.claim.create({
       data: {
-        name,
-        claimType,
+        // name,
+        type,
         userId,
       },
     });

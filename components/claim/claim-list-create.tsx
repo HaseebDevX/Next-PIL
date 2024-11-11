@@ -5,12 +5,14 @@ import Image from 'next/image';
 
 import arrowRight from '@/public/icons/arrow-right-black.svg';
 import btnEdit from '@/public/icons/btn-edit.svg';
+import { ClaimSchema } from '@/schemas';
 
 import HalfCircleProgressBar from '../ui/half-progress-bar';
 import ThemeChip from '../ui/chip';
+
 import { CardHeading } from './cardHeading';
 import { SimpleText } from './simpleText';
-import { ClaimSchema } from '@/schemas';
+
 const ClaimListCreate = (prop: { user: any; userClaims?: Zod.infer<typeof ClaimSchema>[] }) => {
   const [progress, setProgress] = useState(15);
 
@@ -20,7 +22,7 @@ const ClaimListCreate = (prop: { user: any; userClaims?: Zod.infer<typeof ClaimS
     [prop.user];
 
   const data1 = async () => {
-    console.log(prop.user);
+    // console.log(prop.user);
   };
   const router = useRouter();
 
@@ -53,13 +55,13 @@ const ClaimListCreate = (prop: { user: any; userClaims?: Zod.infer<typeof ClaimS
             {prop.userClaims &&
               prop.userClaims.map((claim: Zod.infer<typeof ClaimSchema>) => (
                 <div
-                  key={claim.id + 'claimId'}
                   className='mt-[21px] flex flex-row rounded-[12px] border border-purple bg-white p-[15px]'
+                  key={claim.id + 'claimId'}
                 >
                   <div className='flex-grow space-y-[5px]'>
                     <div className='flex flex-row space-x-[5px] '>
                       <CardHeading title={claim?.type.replaceAll('_', ' ')} />
-                      <ThemeChip title='Pending Info' color='bg-themeRed' />
+                      <ThemeChip color='bg-themeRed' title='Pending Info' />
                     </div>
                     <div className='flex flex-row space-x-2.5 '>
                       <SimpleText title='Incident' />
@@ -99,11 +101,11 @@ const ClaimListCreate = (prop: { user: any; userClaims?: Zod.infer<typeof ClaimS
                 </div>
               ))}
             <div
+              className='mt-[21px] flex cursor-pointer flex-row rounded-[12px] border border-purple bg-white p-[15px]  '
               onClick={() => {
                 sessionStorage.removeItem('claimToEdit');
                 router.push('claim/incident/' + prop.user.id);
               }}
-              className='mt-[21px] flex cursor-pointer flex-row rounded-[12px] border border-purple bg-white p-[15px]  '
             >
               <div className='flex-grow space-y-[5px]'>
                 <CardHeading title='Create New Claim' />
