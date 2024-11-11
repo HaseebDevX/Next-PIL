@@ -3,25 +3,25 @@ import * as RadioGroup from '@radix-ui/react-radio-group';
 import './styles.css';
 
 const RadioGroupDemo = (prop: {
-  options: { label: string; value: string }[];
-  vertical?: boolean;
-  onChange: (val: string) => void;
   defaultValue: string;
   name: string;
+  options: { label: string; value: string }[];
+  onChange: (val: string) => void;
+  vertical?: boolean;
 }) => (
   <RadioGroup.Root
-    onValueChange={(value: string) => {
-      prop.onChange(value);
-    }}
-    className='RadioGroupRoot'
-    defaultValue={prop.defaultValue}
-    aria-label={prop.name}
-    name={prop.name}
+  aria-label={prop.name}
+  className='RadioGroupRoot'
+  defaultValue={prop.defaultValue}
+  name={prop.name}
+  onValueChange={(value: string) => {
+    prop.onChange(value);
+  }}
   >
     <div className={`${prop?.vertical ? 'flex flex-col' : 'flex flex-row'} `}>
       {prop.options.map((option, index) => (
-        <div style={{ display: 'flex', alignItems: 'center' }} key={option.value + prop.name}>
-          <RadioGroup.Item className='RadioGroupItem' value={option.value} id={option.value + prop.name}>
+        <div  key={option.value + prop.name} style={{ display: 'flex', alignItems: 'center' }}>
+          <RadioGroup.Item className='RadioGroupItem' id={option.value + prop.name} value={option.value} >
             <RadioGroup.Indicator className='RadioGroupIndicator' />
           </RadioGroup.Item>
           <label className='Label pr-5' htmlFor={option.value + prop.name}>

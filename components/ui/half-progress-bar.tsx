@@ -15,7 +15,7 @@ const HalfCircleProgressBar: React.FC<ProgressBarProps> = ({ progress = 0 }) => 
 
   return (
     <div className='relative flex items-center justify-center'>
-      <svg width={width} height={height} xmlns='http://www.w3.org/2000/svg'>
+      <svg height={height} width={width}  xmlns='http://www.w3.org/2000/svg'>
         {/* Background Circle */}
         <circle cx={width / 2} cy={height} r={radius} className='stroke-white' strokeWidth='5' fill='none' />
 
