@@ -1,41 +1,64 @@
-// 'use server';
-// import * as zod from 'zod';
+'use server';
+import * as zod from 'zod';
 
-// import { db } from '@/lib/db'; // Assuming you have a database connection set up
-// import { WitnessSchema } from '@/schemas';
+import { db } from '@/lib/db'; // Assuming you have a database connection set up
+import { WitnessSchema } from '@/schemas';
 
-// export const createOrUpdateWitness = async (values: zod.infer<typeof WitnessSchema>) => {
-//   const validatedFields = WitnessSchema.safeParse(values);
-//   if (!validatedFields.success) return { error: 'Invalid fields' };
+export const createOrUpdateWitness = async (values: zod.infer<typeof WitnessSchema>) => {
+  const validatedFields = WitnessSchema.safeParse(values);
 
-//   const { id, isWitness, witnessName, witnessPhone, claimId } = validatedFields.data;
-//   if (id) {
-//     const claimDataUpdated = await db.witness.update({
-//       where: { id: id },
-//       data: {
-//         isWitness,
-//         witnessName,
-//         witnessPhone,
-//         claimId,
-//       },
-//     });
-//     return { success: 'Witness has been updated' };
-//   } else {
-//     const claimDataCreated = await db.witness.create({
-//       data: {
-//         isWitness,
-//         witnessName,
-//         witnessPhone,
-//         claimId,
-//       },
-//     });
-//     return { success: claimDataCreated };
-//   }
 
-//   return { error: 'Something wrong' };
-// };
+  console.log(values)
+  if (!validatedFields.success) return { error: 'Invalid fields' };
 
-// // Delete function for Witness
+  const { id, witnessFirstName, witnessLastName, witnessPhone, claimId } = validatedFields.data;
+  if (id) {
+    // const claimDataUpdated = await db.witness.update({
+    // where: { id: id },
+    // data: {
+    //     witnessFirstName,
+    //     witnessLastName,
+    //     witnessPhone,
+    //     claimId,
+    // },
+    // });
+    return { success: 'Witness has been updated' };
+  } else {
+    const claimDataCreated = await db.witness.create({
+      data: {
+        claimId: claimId.toString(),
+        witnessDetails: {
+          create: [
+            {
+              role: {
+                create: {
+                  account: {
+                    create: {
+                      firstname: witnessFirstName,
+                      lastname: witnessLastName,
+                      phone: witnessPhone,
+                    },
+                  },
+                  roletype: {
+                    connect: {
+                      roleType: 'WITNESS',
+                    },
+                  },
+                },
+              },
+            },
+          ],
+        },
+      },
+    });
+
+    return { success: claimDataCreated };
+  }
+
+  return { error: 'Something wrong' };
+};
+
+// Delete function for Witness
 // export const deleteWitness = async (id: number) => {
 //   try {
 //     const deletedWitness = await db.witness.delete({

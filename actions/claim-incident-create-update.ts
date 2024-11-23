@@ -2,9 +2,9 @@
 import * as zod from 'zod';
 
 import { db } from '@/lib/db';
-import { IncidentSchema } from '@/schemas';
+import { ClaimSchema, IncidentSchema } from '@/schemas';
 
-export const createOrUpdateIncident = async (values: zod.infer<typeof IncidentSchema>) => {
+export const createOrUpdateIncident = async (values: any, claimId: string, attorneyPayload: any) => {
   const validatedFields = IncidentSchema.safeParse(values);
 
   if (!validatedFields.success) return { error: 'Invalid fields' };
@@ -12,7 +12,6 @@ export const createOrUpdateIncident = async (values: zod.infer<typeof IncidentSc
 
   const {
     id,
-    injured,
     date,
     time,
     timeOfDay,
@@ -21,7 +20,6 @@ export const createOrUpdateIncident = async (values: zod.infer<typeof IncidentSc
     description,
     policeReportCompleted,
     policeStation,
-
     policeOfficer,
     reportCompleted,
     reportNumber,
@@ -33,7 +31,7 @@ export const createOrUpdateIncident = async (values: zod.infer<typeof IncidentSc
     priorRepresentation,
     namePriorRepresentation,
     priorRepresentationReason,
-    claimId,
+    roleId,
     claimType,
   } = validatedFields.data;
 
@@ -49,7 +47,6 @@ export const createOrUpdateIncident = async (values: zod.infer<typeof IncidentSc
         description,
         policeReportCompleted,
         policeStation,
-
         policeOfficer,
         reportCompleted,
         reportNumber,
@@ -59,12 +56,12 @@ export const createOrUpdateIncident = async (values: zod.infer<typeof IncidentSc
         amountLoss,
         timeLoss,
         priorRepresentation,
-        namePriorRepresentation,
+        roleId,
         priorRepresentationReason,
       },
     });
 
-    return { success: 'Claim has been updated' };
+    return { success: 'Claim has been updated', claimDataUpdated };
   } else {
     const claimDataCreated = await db.incident.create({
       data: {
@@ -85,9 +82,28 @@ export const createOrUpdateIncident = async (values: zod.infer<typeof IncidentSc
         amountLoss,
         timeLoss,
         priorRepresentation,
-        namePriorRepresentation,
         priorRepresentationReason,
-        claimId,
+        // Connect the existing claim by ID
+        Claim: {
+          connect: {
+            id: claimId, // Ensure this value exists in the `Claim` table
+          },
+        },
+        role: {
+          create: {
+            account: {
+              create: {
+                firstname: attorneyPayload?.firstname,
+                lastname: attorneyPayload?.lastname,
+              },
+            },
+            roletype: {
+              create: {
+                roleType: 'Plaintiff Law Firm',
+              },
+            },
+          },
+        },
       },
     });
 
