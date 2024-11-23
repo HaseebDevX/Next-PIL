@@ -20,11 +20,11 @@ export function CardWrapper({ children, headerLabel, backButtonLabel, backButton
         <AuthFormHeader label={headerLabel} />
       </CardHeader>
       <CardContent>{children}</CardContent>
-      {showSocial && (
+      {/* {showSocial && (
         <CardFooter>
           <SocialButtons />
         </CardFooter>
-      )}
+      )} */}
       <CardFooter>
         <BackButton href={backButtonHref} label={backButtonLabel} />
       </CardFooter>

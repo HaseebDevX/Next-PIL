@@ -184,7 +184,7 @@ export const IncidentSchema = zod.object({
   time: zod.date(),
   timeOfDay: zod.string(),
   location: zod.string(),
-  workRelated: zod.boolean({ message: 'Work realted required' }),
+  workRelated: zod.boolean({ message: 'Work realted required' }), 
   description: zod.string(),
   policeReportCompleted: zod.boolean({ message: 'Police report required' }),
   policeStation: zod.string(),
@@ -202,6 +202,7 @@ export const IncidentSchema = zod.object({
   createdAt: zod.date().optional().nullable(),
   updatedAt: zod.date().optional().nullable(),
   claimId: zod.string(),
+  roleId: zod.string(),
   claimType: zod.enum(
     [
       ClaimType.Car_Accident,
@@ -231,6 +232,17 @@ export const IncidentSchema = zod.object({
     ],
     { message: 'Claim Type is required' }
   ),
+});
+
+export const injuredIncidentSchema = zod.object({
+  firstName: zod.string({message: 'First name is required'}),
+  lastName: zod.string({message: 'Last name is required'}),
+  email: zod.string({message: 'Email is required'}),
+  phone: zod.string({message: 'Phone is required'}),
+  address: zod.string({message: 'Address is required'}),
+  attorneyFirstName: zod.string({message: 'Attorney First Name is required'}),
+  attorneyLastName: zod.string({message: 'Attorney Last Name is required'}),
+  
 });
 
 export const ClaimSchema = zod.object({
@@ -406,34 +418,34 @@ export const ClaimSchema = zod.object({
 //     }
 //   });
 
-// export const WitnessSchema = zod
-//   .object({
-//     id: zod.number().int().nullable().optional(),
-//     isWitness: zod.boolean(),
-//     witnessName: zod.string().nullable().optional(),
-//     witnessPhone: zod.string().nullable().optional(),
-//     createdAt: zod.date().optional(),
-//     updatedAt: zod.date().optional(),
-//     claimId: zod.number().int(),
-//   })
-//   .superRefine((data, ctx) => {
-//     if (data.isWitness === true) {
-//       if (!data.witnessName) {
-//         ctx.addIssue({
-//           code: zod.ZodIssueCode.custom,
-//           message: 'Name of witness is require',
-//           path: ['witnessName'],
-//         });
-//       }
-//       if (!data.witnessPhone) {
-//         ctx.addIssue({
-//           code: zod.ZodIssueCode.custom,
-//           message: 'Witness phone is require',
-//           path: ['witnessPhone'],
-//         });
-//       }
-//     }
-//   });
+export const WitnessSchema = zod.object({
+  id: zod.union([zod.number().int(), zod.string()]).nullable().optional(),
+  witnessFirstName: zod.string().nullable().optional(),
+  witnessLastName: zod.string().nullable().optional(),
+  witnessPhone: zod.string().nullable().optional(),
+  createdAt: zod.date().optional(),
+  updatedAt: zod.date().optional(),
+  claimId: zod.union([zod.number().int(), zod.string()])
+});
+
+  // .superRefine((data, ctx) => {
+  //   if (data.isWitness === true) {
+  //     if (!data.witnessName) {
+  //       ctx.addIssue({
+  //         code: zod.ZodIssueCode.custom,
+  //         message: 'Name of witness is require',
+  //         path: ['witnessName'],
+  //       });
+  //     }
+      // if (!data.witnessPhone) {
+      //   ctx.addIssue({
+      //     code: zod.ZodIssueCode.custom,
+      //     message: 'Witness phone is require',
+      //     path: ['witnessPhone'],
+      //   });
+      // }
+    // }
+  // });
 
 // export const InjurySchema = zod.object({
 //   id: zod.number().int().optional(),

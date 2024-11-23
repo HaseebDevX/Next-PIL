@@ -37,6 +37,12 @@ CREATE TYPE "driverOrPassenger" AS ENUM ('Driver', 'Passenger');
 -- CreateEnum
 CREATE TYPE "DefendantRole" AS ENUM ('Operator', 'Owner', 'Operator_Owner', 'Other');
 
+-- CreateEnum
+CREATE TYPE "MedCare" AS ENUM ('Medicare', 'Medicaid', 'Unemployment', 'Social_Security_Benefits');
+
+-- CreateEnum
+CREATE TYPE "QuestionType" AS ENUM ('TEXT', 'NUMBER', 'DATE', 'YESNO');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
@@ -131,17 +137,119 @@ CREATE TABLE "TwoFactorConfirmation" (
 -- CreateTable
 CREATE TABLE "Claim" (
     "id" TEXT NOT NULL,
-    "name" TEXT,
     "Claim Type" "ClaimType",
-    "Status" "ClaimStatus",
+    "Status" "ClaimStatus" DEFAULT 'PENDING_INFORMATION',
     "Were you injured?" BOOLEAN,
-    "Relationship" "Relationship" NOT NULL,
+    "Relationship" "Relationship",
     "Other Relationship" TEXT,
+    "Do you have health insurance?" BOOLEAN,
+    "Health Insurance Number" TEXT,
+    "Do you currently receive?" "MedCare",
+    "Assigned Claim Specialist" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" TEXT NOT NULL,
+    "clientRoleId" TEXT NOT NULL,
+    "injuredPartyRoleId" TEXT NOT NULL,
 
     CONSTRAINT "Claim_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Questionnaire" (
+    "id" TEXT NOT NULL,
+    "claimId" TEXT NOT NULL,
+
+    CONSTRAINT "Questionnaire_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "QuestionAnswer" (
+    "id" TEXT NOT NULL,
+    "Question ID" TEXT NOT NULL,
+    "Answer" TEXT,
+    "questionnaireId" TEXT,
+
+    CONSTRAINT "QuestionAnswer_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Question" (
+    "id" TEXT NOT NULL,
+    "Claim Type" "ClaimType",
+    "Question" TEXT NOT NULL,
+    "Question type" "QuestionType" NOT NULL,
+    "Choices" TEXT,
+    "Active" BOOLEAN NOT NULL DEFAULT false,
+
+    CONSTRAINT "Question_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Defendant" (
+    "id" TEXT NOT NULL,
+    "claimId" TEXT NOT NULL,
+
+    CONSTRAINT "Defendant_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "DefendantDetails" (
+    "id" TEXT NOT NULL,
+    "Defendant Role" "DefendantRole",
+    "Defendant Policy Number" TEXT,
+    "Defendant Location" TEXT,
+    "Vehicle Make" TEXT,
+    "Vehicle Model" TEXT,
+    "Vehicle Year" TEXT,
+    "Vehicle Color" TEXT,
+    "Vehicle Plate Number" TEXT,
+    "Vehicle Registered State" TEXT,
+    "defendantId" TEXT NOT NULL,
+    "roleId" TEXT NOT NULL,
+
+    CONSTRAINT "DefendantDetails_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "HealthInsuranceProvider" (
+    "id" TEXT NOT NULL,
+    "claimId" TEXT NOT NULL,
+    "roleId" TEXT NOT NULL,
+
+    CONSTRAINT "HealthInsuranceProvider_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "TreatmentAndInjury" (
+    "id" TEXT NOT NULL,
+    "claimId" TEXT NOT NULL,
+    "injuryId" TEXT NOT NULL,
+
+    CONSTRAINT "TreatmentAndInjury_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Injury" (
+    "id" TEXT NOT NULL,
+    "Injury Location" "InjuryPoint" NOT NULL,
+    "Injury" "InjuryType" NOT NULL,
+    "Injury Location Side" "InjurySide" NOT NULL,
+    "treatmentId" TEXT NOT NULL,
+
+    CONSTRAINT "Injury_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Treatment" (
+    "id" TEXT NOT NULL,
+    "Doctor Name" TEXT,
+    "Date of Admission" TIMESTAMP(3),
+    "Date of Discharge" TIMESTAMP(3),
+    "Next Scheduled Date" TIMESTAMP(3),
+    "roleId" TEXT NOT NULL,
+
+    CONSTRAINT "Treatment_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -149,7 +257,7 @@ CREATE TABLE "Incident" (
     "id" TEXT NOT NULL,
     "Date of Accident" TIMESTAMP(3) NOT NULL,
     "Time of Accident" TIMESTAMP(3) NOT NULL,
-    "Accident Time of Day" TEXT NOT NULL,
+    "Accident Time of Day" TEXT,
     "Incident Location" TEXT,
     "Were you at work at the time of the accident?" BOOLEAN NOT NULL,
     "Description of Accident" TEXT,
@@ -164,7 +272,7 @@ CREATE TABLE "Incident" (
     "Approximate Loss of Earning" TEXT,
     "Approximate Missed Time from School? (If in school)" TEXT,
     "Do you currently have representation regarding this claim?" BOOLEAN NOT NULL,
-    "Name of Attorney (If Yes)" TEXT,
+    "roleId" TEXT NOT NULL,
     "Reason for wanting to remove your current representation from your claim?" TEXT,
     "claimId" TEXT NOT NULL,
 
@@ -211,18 +319,18 @@ CREATE TABLE "RoleType" (
 -- CreateTable
 CREATE TABLE "Account" (
     "id" TEXT NOT NULL,
-    "First Name" TEXT NOT NULL,
-    "Last Name" TEXT NOT NULL,
-    "Email Address" TEXT NOT NULL,
-    "Phone" TEXT NOT NULL,
+    "First Name" TEXT,
+    "Last Name" TEXT,
+    "Email Address" TEXT,
+    "Phone" TEXT,
     "Secondary Phone" TEXT,
     "Fax Number" TEXT,
-    "Mailing Address Street" TEXT NOT NULL,
+    "Mailing Address Street" TEXT,
     "Mailing Address Building" TEXT,
-    "Mailing City" TEXT NOT NULL,
-    "Mailing State" TEXT NOT NULL,
-    "Mailing Zip Code" TEXT NOT NULL,
-    "Billing Address Street" TEXT NOT NULL,
+    "Mailing City" TEXT,
+    "Mailing State" TEXT,
+    "Mailing Zip Code" TEXT,
+    "Billing Address Street" TEXT,
     "Billing Address Building" TEXT,
     "Billing Address City" TEXT,
     "Billing Address State" TEXT,
@@ -256,6 +364,33 @@ CREATE UNIQUE INDEX "TwoFactorToken_email_token_key" ON "TwoFactorToken"("email"
 CREATE UNIQUE INDEX "TwoFactorConfirmation_userId_key" ON "TwoFactorConfirmation"("userId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Claim_injuredPartyRoleId_key" ON "Claim"("injuredPartyRoleId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Questionnaire_claimId_key" ON "Questionnaire"("claimId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Defendant_claimId_key" ON "Defendant"("claimId");
+
+-- CreateIndex
+CREATE INDEX "Defendant_claimId_idx" ON "Defendant"("claimId");
+
+-- CreateIndex
+CREATE INDEX "DefendantDetails_defendantId_idx" ON "DefendantDetails"("defendantId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "HealthInsuranceProvider_claimId_key" ON "HealthInsuranceProvider"("claimId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "TreatmentAndInjury_claimId_key" ON "TreatmentAndInjury"("claimId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "TreatmentAndInjury_injuryId_key" ON "TreatmentAndInjury"("injuryId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Incident_roleId_key" ON "Incident"("roleId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Incident_claimId_key" ON "Incident"("claimId");
 
 -- CreateIndex
@@ -272,6 +407,51 @@ ALTER TABLE "TwoFactorConfirmation" ADD CONSTRAINT "TwoFactorConfirmation_userId
 
 -- AddForeignKey
 ALTER TABLE "Claim" ADD CONSTRAINT "Claim_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Claim" ADD CONSTRAINT "Claim_clientRoleId_fkey" FOREIGN KEY ("clientRoleId") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Claim" ADD CONSTRAINT "Claim_injuredPartyRoleId_fkey" FOREIGN KEY ("injuredPartyRoleId") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Questionnaire" ADD CONSTRAINT "Questionnaire_claimId_fkey" FOREIGN KEY ("claimId") REFERENCES "Claim"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "QuestionAnswer" ADD CONSTRAINT "QuestionAnswer_Question ID_fkey" FOREIGN KEY ("Question ID") REFERENCES "Question"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "QuestionAnswer" ADD CONSTRAINT "QuestionAnswer_questionnaireId_fkey" FOREIGN KEY ("questionnaireId") REFERENCES "Questionnaire"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Defendant" ADD CONSTRAINT "Defendant_claimId_fkey" FOREIGN KEY ("claimId") REFERENCES "Claim"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "DefendantDetails" ADD CONSTRAINT "DefendantDetails_defendantId_fkey" FOREIGN KEY ("defendantId") REFERENCES "Defendant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "DefendantDetails" ADD CONSTRAINT "DefendantDetails_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "HealthInsuranceProvider" ADD CONSTRAINT "HealthInsuranceProvider_claimId_fkey" FOREIGN KEY ("claimId") REFERENCES "Claim"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "HealthInsuranceProvider" ADD CONSTRAINT "HealthInsuranceProvider_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TreatmentAndInjury" ADD CONSTRAINT "TreatmentAndInjury_claimId_fkey" FOREIGN KEY ("claimId") REFERENCES "Claim"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TreatmentAndInjury" ADD CONSTRAINT "TreatmentAndInjury_injuryId_fkey" FOREIGN KEY ("injuryId") REFERENCES "Injury"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Injury" ADD CONSTRAINT "Injury_treatmentId_fkey" FOREIGN KEY ("treatmentId") REFERENCES "Treatment"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Treatment" ADD CONSTRAINT "Treatment_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Incident" ADD CONSTRAINT "Incident_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Incident" ADD CONSTRAINT "Incident_claimId_fkey" FOREIGN KEY ("claimId") REFERENCES "Claim"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

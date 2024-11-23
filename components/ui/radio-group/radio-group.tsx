@@ -18,7 +18,7 @@ const RadioGroupDemo = (prop: {
     prop.onChange(value);
   }}
   >
-    <div className={`${prop?.vertical ? 'flex flex-col' : 'flex flex-row'} `}>
+    <div className={`mb-2 ${prop?.vertical ? 'flex flex-col' : 'flex flex-row'} `}>
       {prop.options.map((option, index) => (
         <div  key={option.value + prop.name} style={{ display: 'flex', alignItems: 'center' }}>
           <RadioGroup.Item className='RadioGroupItem' id={option.value + prop.name} value={option.value} >

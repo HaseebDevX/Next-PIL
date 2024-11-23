@@ -11,8 +11,8 @@ import { NavbarMobile } from '@/components/navbar/NavBarMobile';
 export default async function ProtectedLayout(props: { children: React.ReactNode }) {
   return (
     <>
-      <div className='flex flex-row '>
-        <div className='hidden md:block lg:block xl:block'>
+      <div className='flex'>
+        <div className='fixed left-0 top-0 hidden h-screen bg-purpledark md:block lg:block xl:block'>
           <Navbar>
             <Image alt='Paininjurylaw' className='' height={55} priority src={logo} width={300} />
             <NavigationMenu />
@@ -23,8 +23,10 @@ export default async function ProtectedLayout(props: { children: React.ReactNode
             </LogoutButton>
           </Navbar>
         </div>
-        <div className='w-full'>{props.children}</div>
+
+        <div className='ml-[300px] w-full'>{props.children}</div>
       </div>
+
       <footer className='fixed bottom-0 block w-full md:hidden lg:hidden xl:hidden'>
         <NavbarMobile />
       </footer>

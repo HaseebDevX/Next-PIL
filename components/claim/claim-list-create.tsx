@@ -13,16 +13,17 @@ import ThemeChip from '../ui/chip';
 import { CardHeading } from './cardHeading';
 import { SimpleText } from './simpleText';
 
-const ClaimListCreate = (prop: { user: any; userClaims?: Zod.infer<typeof ClaimSchema>[] }) => {
+const ClaimListCreate = (prop?: { user?: any; userClaims?: Zod.infer<typeof ClaimSchema>[] }) => {
   const [progress, setProgress] = useState(15);
+  
 
   useEffect(() => {
     data1();
   }),
-    [prop.user];
+    [prop?.user];
 
   const data1 = async () => {
-    // console.log(prop.user);
+    // console.log(prop?.user?);
   };
   const router = useRouter();
 
@@ -43,17 +44,17 @@ const ClaimListCreate = (prop: { user: any; userClaims?: Zod.infer<typeof ClaimS
               <div className='flex-grow'>
                 <CardHeading title='Account Details' />
                 <SimpleText
-                  title={`First Name:  ${prop.user.firstname || ''} ${prop.user.middleName || ''} ${prop.user.lastname || ''}`}
+                  title={`First Name:  ${prop?.user?.firstname || ''} ${prop?.user?.middleName || ''} ${prop?.user?.lastname || ''}`}
                 />
-                <SimpleText title={`Email: ${prop.user.email || ''}`} />
-                <SimpleText title={`Mobile: ${prop.user.phone || ''}`} />
+                <SimpleText title={`Email: ${prop?.user?.email || ''}`} />
+                <SimpleText title={`Mobile: ${prop?.user?.phone || ''}`} />
               </div>
               <span className='cursor-pointer '>
                 <Image alt='Paininjurylaw' className='' height={24} priority src={btnEdit} width={24} />
               </span>
             </div>
-            {prop.userClaims &&
-              prop.userClaims.map((claim: Zod.infer<typeof ClaimSchema>) => (
+            {prop?.userClaims &&
+              prop?.userClaims.map((claim: Zod.infer<typeof ClaimSchema>) => (
                 <div
                   className='mt-[21px] flex flex-row rounded-[12px] border border-purple bg-white p-[15px]'
                   key={claim.id + 'claimId'}
@@ -69,7 +70,7 @@ const ClaimListCreate = (prop: { user: any; userClaims?: Zod.infer<typeof ClaimS
                     </div>
                     <div className='flex flex-row space-x-2.5 '>
                       <SimpleText title='Witness' />
-                      <SimpleText textColor='text-themeGreen' title='COMPLETED' />
+                      <SimpleText textColor='text-themeRed' title='PENDING' />
                     </div>
                     <div className='flex flex-row space-x-2.5 '>
                       <SimpleText title='Defendant' />
@@ -92,7 +93,7 @@ const ClaimListCreate = (prop: { user: any; userClaims?: Zod.infer<typeof ClaimS
                       className='btn max-w-[105px] cursor-pointer text-center'
                       onClick={() => {
                         sessionStorage.setItem('claimToEdit', JSON.stringify(claim));
-                        router.push(`claim/incident/${prop.user.id}?claimId=${claim?.id ?? ''} `);
+                        router.push(`claim/incident/${prop?.user?.id}?claimId=${claim?.id ?? ''} `);
                       }}
                     >
                       Edit
@@ -104,7 +105,8 @@ const ClaimListCreate = (prop: { user: any; userClaims?: Zod.infer<typeof ClaimS
               className='mt-[21px] flex cursor-pointer flex-row rounded-[12px] border border-purple bg-white p-[15px]  '
               onClick={() => {
                 sessionStorage.removeItem('claimToEdit');
-                router.push('claim/incident/' + prop.user.id);
+                sessionStorage.setItem('userInfo', JSON.stringify(prop?.user));
+                router.push('claim/incident/' + prop?.user?.id);
               }}
             >
               <div className='flex-grow space-y-[5px]'>
