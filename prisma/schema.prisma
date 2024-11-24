@@ -457,7 +457,7 @@ model Role {
 
 model RoleType {
   id        String   @id @default(uuid())
-  roleType  String
+  roleType  String 
   createdAt DateTime @default(now())
   createdBy String?
   enable    Boolean?

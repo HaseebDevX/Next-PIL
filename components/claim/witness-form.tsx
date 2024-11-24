@@ -29,7 +29,7 @@ export default function WitnessForm({ claimId, witness }: WitnessFormProps) {
   const form = useForm<zod.infer<typeof WitnessSchema>>({
     resolver: zodResolver(WitnessSchema),
     defaultValues: {
-      id: '',
+      id: null,
       witnessFirstName: '',
       witnessLastName: '',
       witnessPhone: '',
@@ -46,6 +46,7 @@ export default function WitnessForm({ claimId, witness }: WitnessFormProps) {
     setSuccess('');
     startTransition(async () => {
       try {
+        console.log("values", values)
         const response: any = await createOrUpdateWitness(values);
         if (response.error) {
           setError(response.error);

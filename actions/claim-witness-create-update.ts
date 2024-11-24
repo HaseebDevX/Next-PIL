@@ -5,7 +5,6 @@ import { db } from '@/lib/db'; // Assuming you have a Prisma database connection
 import { WitnessSchema } from '@/schemas';
 
 export const createOrUpdateWitness = async (values: zod.infer<typeof WitnessSchema>) => {
-  // Validate the input data against the schema
   const validatedFields = WitnessSchema.safeParse(values);
 
   if (!validatedFields.success) {
@@ -15,21 +14,34 @@ export const createOrUpdateWitness = async (values: zod.infer<typeof WitnessSche
   const { id, witnessFirstName, witnessLastName, witnessPhone, claimId }: any = validatedFields.data;
 
   try {
-    console.log("FoundID", id)
-    if (id) {
+    if (id && id !== "") {
       // Update an existing witness
       const updatedWitness = await db.witness.update({
         where: { id },
         data: {
           witnessDetails: {
             update: {
-              role: {
-                update: {
-                  account: {
-                    update: {
-                      firstname: witnessFirstName,
-                      lastname: witnessLastName,
-                      phone: witnessPhone,
+              where: { id: witnessDetailId }, // Replace with the correct WitnessDetail ID
+              data: {
+                role: {
+                  update: {
+                    account: {
+                      update: {
+                        firstname: witnessFirstName,
+                        lastname: witnessLastName,
+                        phone: witnessPhone,
+                      },
+                    },
+                    roletype: {
+                      connectOrCreate: {
+                        where: {
+                          roleType: 'Witness', // Ensure the `roleType` value is unique
+                        },
+                        create: {
+                          roleType: 'Witness',
+                          createdBy: 'system', // Optional: Populate other fields as necessary
+                        },
+                      },
                     },
                   },
                 },
@@ -37,7 +49,20 @@ export const createOrUpdateWitness = async (values: zod.infer<typeof WitnessSche
             },
           },
         },
+        include: {
+          witnessDetails: {
+            include: {
+              role: {
+                include: {
+                  account: true,
+                  roletype: true,
+                },
+              },
+            },
+          },
+        },
       });
+      
 
       return { success: updatedWitness, message: 'Witness has been updated successfully' };
     } else {
@@ -57,8 +82,8 @@ export const createOrUpdateWitness = async (values: zod.infer<typeof WitnessSche
                     },
                   },
                   roletype: {
-                    connect: {
-                      roleType: 'Witness', // Ensure this matches the exact RoleType in your database
+                    create: {
+                      roleType: 'Witness', // This will create a new `RoleType` entry for every new witness
                     },
                   },
                 },
@@ -84,9 +109,11 @@ export const createOrUpdateWitness = async (values: zod.infer<typeof WitnessSche
     }
   } catch (error) {
     console.error('Error creating or updating witness:', error);
+
     return { error: 'Failed to create or update witness', details: error };
   }
 };
+
 
 
 // Delete function for Witness
