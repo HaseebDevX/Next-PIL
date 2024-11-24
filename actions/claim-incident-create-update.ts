@@ -2,13 +2,12 @@
 import * as zod from 'zod';
 
 import { db } from '@/lib/db';
-import { ClaimSchema, IncidentSchema } from '@/schemas';
+import { IncidentSchema } from '@/schemas';
 
 export const createOrUpdateIncident = async (values: any, claimId: string, attorneyPayload: any) => {
   const validatedFields = IncidentSchema.safeParse(values);
 
   if (!validatedFields.success) return { error: 'Invalid fields' };
-  // console.log(validatedFields.data);
 
   const {
     id,
@@ -29,10 +28,8 @@ export const createOrUpdateIncident = async (values: any, claimId: string, attor
     amountLoss,
     timeLoss,
     priorRepresentation,
-    namePriorRepresentation,
     priorRepresentationReason,
     roleId,
-    claimType,
   } = validatedFields.data;
 
   if (id) {
@@ -61,7 +58,7 @@ export const createOrUpdateIncident = async (values: any, claimId: string, attor
       },
     });
 
-    return { success: 'Claim has been updated', claimDataUpdated };
+    return { success: 'Incident has been updated', claimDataUpdated };
   } else {
     const claimDataCreated = await db.incident.create({
       data: {
@@ -83,11 +80,8 @@ export const createOrUpdateIncident = async (values: any, claimId: string, attor
         timeLoss,
         priorRepresentation,
         priorRepresentationReason,
-        // Connect the existing claim by ID
         Claim: {
-          connect: {
-            id: claimId, // Ensure this value exists in the `Claim` table
-          },
+          connect: { id: claimId },
         },
         role: {
           create: {
@@ -98,9 +92,7 @@ export const createOrUpdateIncident = async (values: any, claimId: string, attor
               },
             },
             roletype: {
-              create: {
-                roleType: 'Plaintiff Law Firm',
-              },
+              create: { roleType: 'Plaintiff Law Firm' },
             },
           },
         },
@@ -110,5 +102,18 @@ export const createOrUpdateIncident = async (values: any, claimId: string, attor
     return { success: claimDataCreated };
   }
 
-  return { error: 'Something wrong' };
+  return { error: 'Something went wrong' };
+};
+
+export const getIncidentById = async (incidentId: string) => {
+  try {
+    const incident = await db.incident.findUnique({
+      where: { id: incidentId },
+      include: { role: { include: { account: true } } },
+    });
+    return incident;
+  } catch (error) {
+    console.error('Error fetching incident:', error);
+    return null;
+  }
 };

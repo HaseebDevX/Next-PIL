@@ -16,7 +16,7 @@ import { SimpleText } from './simpleText';
 const ClaimListCreate = (prop?: { user?: any; userClaims?: Zod.infer<typeof ClaimSchema>[] }) => {
   const [progress, setProgress] = useState(15);
   
-
+console.log("userClaims", prop)
   useEffect(() => {
     data1();
   }),
@@ -54,7 +54,7 @@ const ClaimListCreate = (prop?: { user?: any; userClaims?: Zod.infer<typeof Clai
               </span>
             </div>
             {prop?.userClaims &&
-              prop?.userClaims.map((claim: Zod.infer<typeof ClaimSchema>) => (
+              prop?.userClaims.map((claim: any) => (
                 <div
                   className='mt-[21px] flex flex-row rounded-[12px] border border-purple bg-white p-[15px]'
                   key={claim.id + 'claimId'}
@@ -93,7 +93,7 @@ const ClaimListCreate = (prop?: { user?: any; userClaims?: Zod.infer<typeof Clai
                       className='btn max-w-[105px] cursor-pointer text-center'
                       onClick={() => {
                         sessionStorage.setItem('claimToEdit', JSON.stringify(claim));
-                        router.push(`claim/incident/${prop?.user?.id}?claimId=${claim?.id ?? ''} `);
+                        router.push(`claim/incident/${prop?.user?.id}?incidentId=${claim?.incident?.id ?? ''}&claimId=${claim?.id ?? ''} `);
                       }}
                     >
                       Edit

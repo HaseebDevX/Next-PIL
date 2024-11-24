@@ -1,101 +1,65 @@
 'use client';
 import * as zod from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
-import { FaPenToSquare, FaTrash } from 'react-icons/fa6';
 
-import { createOrUpdateWitness, 
-    // deleteWitness 
-} from '@/actions/claim-witness-create-update';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { WitnessSchema } from '@/schemas';
 import { FormError } from '@/components/form-messages/FormError';
 import { FormSuccess } from '@/components/form-messages/FormSuccess';
+import { createOrUpdateWitness } from '@/actions/claim-witness-create-update';
 
 type Witness = Array<zod.infer<typeof WitnessSchema>>;
+
 interface WitnessFormProps {
-  claimId:  string | undefined;
+  claimId: string | undefined;
   witness: Witness;
 }
 
-export default function WitnessForm(
-  {
-    claimId,
-    witness
-  }: WitnessFormProps
-) {
-  const router = useRouter();
+export default function WitnessForm({ claimId, witness }: WitnessFormProps) {
   const [error, setError] = useState<string | undefined>('');
-  const [witnessArr, setWitnessArr] = useState<Witness>([]);
-  const [showBtn, setShowBtn] = useState<Boolean>(false);
   const [success, setSuccess] = useState<string | undefined>('');
+  const [witnessArr, setWitnessArr] = useState<Witness>(witness || []);
+  const [showBtn, setShowBtn] = useState<boolean>(false);
   const [isPending, startTransition] = useTransition();
-  const [editingWitness, setEditingWitness] = useState<zod.infer<typeof WitnessSchema> | null>(null);
 
   const form = useForm<zod.infer<typeof WitnessSchema>>({
     resolver: zodResolver(WitnessSchema),
     defaultValues: {
-      id: undefined,
+      id: '',
       witnessFirstName: '',
       witnessLastName: '',
       witnessPhone: '',
-      claimId: claimId,
+      claimId,
     },
   });
 
-  const handleEditClick = () => {
-    setShowBtn(false);
-    // setEditingWitness(witnessData);
-
-    // Object.keys(witnessData).forEach((key) => {
-    //   form.setValue(key as keyof zod.infer<typeof WitnessSchema>, witnessData[key as keyof typeof witnessData]); // Cast the key properly
-    // });
+  const onError = (errors: any) => {
+    console.log('Validation errors:', errors); // Debug validation issues
   };
 
-  const handleDeleteClick = (witnessId: number | null | undefined) => {
-    if (witnessId && window.confirm('Are you sure you want to delete this witness?')) {
-      startTransition(() => {
-        // Assuming you have a delete API function
-        // deleteWitness(witnessId).then((data) => {
-        //   if (data.success) {
-        //     setWitnessArr((prevWitnesses) => prevWitnesses.filter((item) => item.id !== witnessId));
-        //     form.reset()
-        //     setSuccess("Witness deleted successfully!");
-        //   } else {
-        //     setError("Failed to delete witness.");
-        //   }
-      });
-      //   });
-    }
-  };
-//Todo tahir
-  const onSubmit = (values: zod.infer<typeof WitnessSchema>) => {
+  const onSubmit = async (values: zod.infer<typeof WitnessSchema>) => {
     setError('');
     setSuccess('');
-        console.log(values)
-
-    startTransition(() => {
-        //   createOrUpdateWitness(values).then((data) => {
-        //     setError(data.error);
-        //     if (data?.success) {
-        //       if (editingWitness) {
-        //         // Update existing witness
-        //         const updatedWitnesses = witnessArr.map((item) =>
-        //           item.id === editingWitness.id ? values : item
-        //         );
-        //         setWitnessArr(updatedWitnesses);
-        //         setEditingWitness(null); // Clear editing state after update
-        //       } else {
-        //         // Add new witness
-        //         setWitnessArr([...witnessArr, data.success as zod.infer<typeof WitnessSchema>]);
-        //       }
-        //       setShowBtn(true); // Show "Add Witness" button again
-        //     }
-        //   });
+    startTransition(async () => {
+      try {
+        const response: any = await createOrUpdateWitness(values);
+        if (response.error) {
+          setError(response.error);
+        } else {
+          // Add the newly created witness to the local state
+          setWitnessArr([...witnessArr, response.success]);
+          form.reset();
+          setShowBtn(true); // Show "Add Witness" button
+          setSuccess('Witness added successfully!');
+        }
+      } catch (err) {
+        console.error('Error creating witness:', err);
+        setError('Failed to save witness. Please try again.');
+      }
     });
   };
 
@@ -109,96 +73,93 @@ export default function WitnessForm(
     <>
       {showBtn && (
         <Button
-          className='w-[120px] p-6'
+          className="w-[120px] p-6"
           onClick={() => {
-            setShowBtn(false);
             form.reset();
+            setShowBtn(false);
           }}
         >
           Add Witness
         </Button>
       )}
 
-      {!witnessArr.length || !showBtn ? (
+      {!showBtn && (
         <Form {...form}>
           <form
-            className='space-y-4'
-              onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4"
+            onSubmit={form.handleSubmit(onSubmit, onError)} // Properly handle submission
           >
-            <>
-              <FormField
-                control={form.control}
-                name='witnessFirstName'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>First Name of Witness</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder='Enter First Name of Witness' value={field.value ?? ''} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='witnessLastName'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Last Name of Witness</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder='Enter Witness Last Name' value={field.value ?? ''} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='witnessPhone'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder='Enter Witness Phone' value={field.value ?? ''} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </>
-
             <FormField
               control={form.control}
-              name='claimId'
+              name="witnessFirstName"
               render={({ field }) => (
-                <FormItem className='hidden'>
-                  <FormLabel>Claim ID</FormLabel>
-                  <FormControl>{/* <Input {...field} value={claimId} /> */}</FormControl>
+                <FormItem>
+                  <FormLabel>First Name of Witness</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Enter First Name of Witness" value={field.value ?? ''} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            {/* Submit Button */}
+            <FormField
+              control={form.control}
+              name="witnessLastName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Last Name of Witness</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Enter Witness Last Name" value={field.value ?? ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="witnessPhone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Enter Witness Phone" value={field.value ?? ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="claimId"
+              render={({ field }) => (
+                <FormItem className="hidden">
+                  <FormLabel>Claim ID</FormLabel>
+                  <FormControl>
+                    <Input {...field} value={field.value ?? ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormError message={error} />
             <FormSuccess message={success} />
-            <div className='grid grid-cols-4 gap-4'>
-              {/* {witnessArr.length > 0 &&  */}
+            <div className="grid grid-cols-4 gap-4">
               <Button
-                disabled={isPending}
-                //  onClick={() => { setEditingWitness(null); setShowBtn(true); form.reset(); }}
-                type='button'
+                onClick={() => {
+                  form.reset();
+                  setShowBtn(true);
+                }}
+                type="button"
               >
                 Cancel
               </Button>
-
-              <Button disabled={isPending} type='submit'>
+              <Button className="cursor-pointer" type="submit">
                 Save Witness
               </Button>
             </div>
           </form>
         </Form>
-      ) : null}
+      )}
     </>
   );
 }

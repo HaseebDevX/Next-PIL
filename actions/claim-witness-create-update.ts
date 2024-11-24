@@ -1,35 +1,52 @@
 'use server';
 import * as zod from 'zod';
 
-import { db } from '@/lib/db'; // Assuming you have a database connection set up
+import { db } from '@/lib/db'; // Assuming you have a Prisma database connection set up
 import { WitnessSchema } from '@/schemas';
 
 export const createOrUpdateWitness = async (values: zod.infer<typeof WitnessSchema>) => {
+  // Validate the input data against the schema
   const validatedFields = WitnessSchema.safeParse(values);
 
+  if (!validatedFields.success) {
+    return { error: 'Invalid fields', details: validatedFields.error };
+  }
 
-  console.log(values)
-  if (!validatedFields.success) return { error: 'Invalid fields' };
+  const { id, witnessFirstName, witnessLastName, witnessPhone, claimId }: any = validatedFields.data;
 
-  const { id, witnessFirstName, witnessLastName, witnessPhone, claimId } = validatedFields.data;
-  if (id) {
-    // const claimDataUpdated = await db.witness.update({
-    // where: { id: id },
-    // data: {
-    //     witnessFirstName,
-    //     witnessLastName,
-    //     witnessPhone,
-    //     claimId,
-    // },
-    // });
-    return { success: 'Witness has been updated' };
-  } else {
-    const claimDataCreated = await db.witness.create({
-      data: {
-        claimId: claimId.toString(),
-        witnessDetails: {
-          create: [
-            {
+  try {
+    console.log("FoundID", id)
+    if (id) {
+      // Update an existing witness
+      const updatedWitness = await db.witness.update({
+        where: { id },
+        data: {
+          witnessDetails: {
+            update: {
+              role: {
+                update: {
+                  account: {
+                    update: {
+                      firstname: witnessFirstName,
+                      lastname: witnessLastName,
+                      phone: witnessPhone,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return { success: updatedWitness, message: 'Witness has been updated successfully' };
+    } else {
+      // Create a new witness
+      const createdWitness = await db.witness.create({
+        data: {
+          claimId,
+          witnessDetails: {
+            create: {
               role: {
                 create: {
                   account: {
@@ -41,22 +58,36 @@ export const createOrUpdateWitness = async (values: zod.infer<typeof WitnessSche
                   },
                   roletype: {
                     connect: {
-                      roleType: 'WITNESS',
+                      roleType: 'Witness', // Ensure this matches the exact RoleType in your database
                     },
                   },
                 },
               },
             },
-          ],
+          },
         },
-      },
-    });
+        include: {
+          witnessDetails: {
+            include: {
+              role: {
+                include: {
+                  account: true,
+                  roletype: true,
+                },
+              },
+            },
+          },
+        },
+      });
 
-    return { success: claimDataCreated };
+      return { success: createdWitness, message: 'Witness has been created successfully' };
+    }
+  } catch (error) {
+    console.error('Error creating or updating witness:', error);
+    return { error: 'Failed to create or update witness', details: error };
   }
-
-  return { error: 'Something wrong' };
 };
+
 
 // Delete function for Witness
 // export const deleteWitness = async (id: number) => {

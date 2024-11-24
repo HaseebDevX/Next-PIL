@@ -18,7 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { FormError } from '@/components/form-messages/FormError';
 import { FormSuccess } from '@/components/form-messages/FormSuccess';
-import { createOrUpdateIncident } from '@/actions/claim-incident-create-update';
+import { createOrUpdateIncident, getIncidentById } from '@/actions/claim-incident-create-update';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import { createClaim } from '@/actions/claim-create';
@@ -34,6 +34,7 @@ import WitnessFormComponent from '@/components/claim/witness-form';
 export default function CreateNewClaim() {
   const searchParams = useSearchParams();
   const claimIdForUpdate = searchParams.get('claimId');
+  const incidentId = searchParams.get('incidentId');
   const params = useParams();
   const userId = params?.userId;
   const router = useRouter();
@@ -93,8 +94,49 @@ export default function CreateNewClaim() {
       setIncidentData(claimIdForUpdate);
     }
   }, [claimIdForUpdate, formDataLoaded]);
+  
+  const getIncidentByIncidentId = async () => {
+    if (incidentId) {
+      try {
+        const incidentData = await getIncidentById(incidentId);
+  
+        if (incidentData) {
+          form.setValue("date", new Date(incidentData.date) || new Date());
+          form.setValue("location", incidentData.location || "");
+          form.setValue("description", incidentData.description || "");
+          form.setValue("policeOfficer", incidentData.policeOfficer || "");
+          form.setValue("reportNumber", incidentData.reportNumber || "");
+          form.setValue("amountLoss", incidentData.amountLoss || "");
+          form.setValue("timeLoss", incidentData.timeLoss || "");
+          form.setValue("priorRepresentationReason", incidentData.priorRepresentationReason || "");
+          form.setValue("id", incidentData.id || undefined);
+          form.setValue("time", new Date(incidentData.time) || new Date());
+          form.setValue("timeOfDay", incidentData.timeOfDay || "PM");
+          form.setValue("workRelated", incidentData.workRelated || false);
+          form.setValue("policeReportCompleted", incidentData.policeReportCompleted || false);
+          form.setValue("policeStation", incidentData.policeStation || "");
+          form.setValue("reportCompleted", incidentData.reportCompleted || false);
+          form.setValue("supportingDocument", incidentData.supportingDocument || false);
+          form.setValue("supportingDocumentUpload", incidentData.supportingDocumentUpload || "");
+          form.setValue("lostEarning", incidentData.lostEarning || false);
+          form.setValue("priorRepresentation", incidentData.priorRepresentation || false);
+          form.setValue("claimId", incidentData.claimId || "");
+          form.setValue("roleId", incidentData.roleId || "");
+        }
+      } catch (error) {
+        console.error("Error fetching incident data:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    getIncidentByIncidentId();
+  }, []);
 
   const setIncidentData = async (id: string) => {
+    if(claimIdForUpdate){
+      setClaimSavedId(claimIdForUpdate)
+    }
     formDataLoaded.current = true;
     let claimToEditString = sessionStorage.getItem('claimToEdit');
     const claimToEdit: zod.infer<typeof ClaimSchema> = JSON.parse(claimToEditString || '');
@@ -699,24 +741,26 @@ export default function CreateNewClaim() {
                     <FormSuccess message={success} />
                     <div className='pt-5' />
                     {/* <Button className=' my-4 w-full p-6' disabled={isPending} type='submit'> */}
-                    <Button className=' ' disabled={isPending} type='submit'>
+                    <Button className='cursor-pointer' disabled={isPending} type='submit'>
                       Submit
                     </Button>
                   </div>
                 </div>
 
-                {/* Witness Part  */}
-                <div className='mt-[21px] flex  flex-row rounded-[12px] border border-purple bg-white p-[15px]'>
-                  <div className='flex-grow space-y-[5px]'>
-                    <CardHeading title='Witness' />
-                    <div className='pb-5' />
-                    <WitnessFormComponent claimId={savedClaimId} witness={[]}                  />
-                  </div>
-                </div>
+                
               </>
             )}
           </form>
         </Form>
+        {/* Witness Part  */}
+        {(selectedClaimType && savedClaimId) && ( <div className='mt-[21px] flex  flex-row rounded-[12px] border border-purple bg-white p-[15px]'>
+            <div className='flex-grow space-y-[5px]'>
+              <CardHeading title='Witness' />
+              <div className='pb-5' />
+              <WitnessFormComponent claimId={savedClaimId} witness={[]}                  />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
