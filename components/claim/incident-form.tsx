@@ -20,7 +20,7 @@
 // type Incident = Array<zod.infer<typeof IncidentSchema>>;
 // interface IncidentFormProps {
 //   claimId: number;
-//   incident: Incident; 
+//   incident: Incident;
 // }
 
 // export default function IncidentForm({ claimId, incident }: IncidentFormProps) {

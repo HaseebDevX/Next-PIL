@@ -4,7 +4,7 @@ import * as zod from 'zod';
 import { db } from '@/lib/db';
 import { IncidentSchema } from '@/schemas';
 
-export const createOrUpdateIncident = async (values: any, claimId: string, attorneyPayload: any) => {
+export const createOrUpdateIncident = async (values: any, claimId: string, attorneyPayload: any, incidentId:string) => {
   const validatedFields = IncidentSchema.safeParse(values);
 
   if (!validatedFields.success) return { error: 'Invalid fields' };
@@ -33,8 +33,8 @@ export const createOrUpdateIncident = async (values: any, claimId: string, attor
   } = validatedFields.data;
 
   if (id) {
-    const claimDataUpdated = await db.incident.update({
-      where: { id: id },
+    const updatedIncident = await db.incident.update({
+      where: { id: incidentId },
       data: {
         date,
         time,
@@ -53,12 +53,27 @@ export const createOrUpdateIncident = async (values: any, claimId: string, attor
         amountLoss,
         timeLoss,
         priorRepresentation,
-        roleId,
         priorRepresentationReason,
+        role: {
+          update: {
+            account: {
+              upsert: {
+                create: {
+                  firstname: attorneyPayload?.firstname,
+                  lastname: attorneyPayload?.lastname,
+                },
+                update: {
+                  firstname: attorneyPayload?.firstname,
+                  lastname: attorneyPayload?.lastname,
+                },
+              },
+            },
+          },
+        },
       },
     });
 
-    return { success: 'Incident has been updated', claimDataUpdated };
+    return { success: 'Incident has been updated', updatedIncident };
   } else {
     const claimDataCreated = await db.incident.create({
       data: {

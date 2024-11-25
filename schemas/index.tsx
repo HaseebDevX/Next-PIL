@@ -235,14 +235,13 @@ export const IncidentSchema = zod.object({
 });
 
 export const injuredIncidentSchema = zod.object({
-  firstName: zod.string({message: 'First name is required'}),
-  lastName: zod.string({message: 'Last name is required'}),
+  firstname: zod.string({message: 'First name is required'}),
+  lastname: zod.string({message: 'Last name is required'}),
   email: zod.string({message: 'Email is required'}),
   phone: zod.string({message: 'Phone is required'}),
-  address: zod.string({message: 'Address is required'}),
+  mailingAddress: zod.string({message: 'Address is required'}),
   attorneyFirstName: zod.string({message: 'Attorney First Name is required'}),
   attorneyLastName: zod.string({message: 'Attorney Last Name is required'}),
-  
 });
 
 export const ClaimSchema = zod.object({
@@ -297,6 +296,16 @@ export const ClaimSchema = zod.object({
     required_error: 'User cannot create account.',
   }),
   incident: zod.array(IncidentSchema).optional().nullable(),
+  clientRole: zod.object({
+    account: zod.object({
+      id: zod.string(),
+      firstname: zod.string(),
+      lastname: zod.string(),
+      email: zod.string(),
+      phone: zod.string(),
+      mailingAddress: zod.string(),
+    })
+  }).optional().nullable()
 });
 // export const IncidentSchema = zod
 //   .object({

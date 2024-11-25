@@ -38,7 +38,7 @@ export default function WitnessForm({ claimId, witness }: WitnessFormProps) {
   });
 
   const onError = (errors: any) => {
-    console.log('Validation errors:', errors); // Debug validation issues
+    // console.log('Validation errors:', errors); // Debug validation issues
   };
 
   const onSubmit = async (values: zod.infer<typeof WitnessSchema>) => {
@@ -46,7 +46,7 @@ export default function WitnessForm({ claimId, witness }: WitnessFormProps) {
     setSuccess('');
     startTransition(async () => {
       try {
-        console.log("values", values)
+        // console.log('values', values);
         const response: any = await createOrUpdateWitness(values);
         if (response.error) {
           setError(response.error);
@@ -74,7 +74,7 @@ export default function WitnessForm({ claimId, witness }: WitnessFormProps) {
     <>
       {showBtn && (
         <Button
-          className="w-[120px] p-6"
+          className='w-[120px] p-6'
           onClick={() => {
             form.reset();
             setShowBtn(false);
@@ -87,17 +87,17 @@ export default function WitnessForm({ claimId, witness }: WitnessFormProps) {
       {!showBtn && (
         <Form {...form}>
           <form
-            className="space-y-4"
+            className='space-y-4'
             onSubmit={form.handleSubmit(onSubmit, onError)} // Properly handle submission
           >
             <FormField
               control={form.control}
-              name="witnessFirstName"
+              name='witnessFirstName'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>First Name of Witness</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Enter First Name of Witness" value={field.value ?? ''} />
+                    <Input {...field} placeholder='Enter First Name of Witness' value={field.value ?? ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -105,12 +105,12 @@ export default function WitnessForm({ claimId, witness }: WitnessFormProps) {
             />
             <FormField
               control={form.control}
-              name="witnessLastName"
+              name='witnessLastName'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Last Name of Witness</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Enter Witness Last Name" value={field.value ?? ''} />
+                    <Input {...field} placeholder='Enter Witness Last Name' value={field.value ?? ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -118,12 +118,12 @@ export default function WitnessForm({ claimId, witness }: WitnessFormProps) {
             />
             <FormField
               control={form.control}
-              name="witnessPhone"
+              name='witnessPhone'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Phone</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Enter Witness Phone" value={field.value ?? ''} />
+                    <Input {...field} placeholder='Enter Witness Phone' value={field.value ?? ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -131,9 +131,9 @@ export default function WitnessForm({ claimId, witness }: WitnessFormProps) {
             />
             <FormField
               control={form.control}
-              name="claimId"
+              name='claimId'
               render={({ field }) => (
-                <FormItem className="hidden">
+                <FormItem className='hidden'>
                   <FormLabel>Claim ID</FormLabel>
                   <FormControl>
                     <Input {...field} value={field.value ?? ''} />
@@ -144,17 +144,17 @@ export default function WitnessForm({ claimId, witness }: WitnessFormProps) {
             />
             <FormError message={error} />
             <FormSuccess message={success} />
-            <div className="grid grid-cols-4 gap-4">
+            <div className='grid grid-cols-4 gap-4'>
               <Button
                 onClick={() => {
                   form.reset();
                   setShowBtn(true);
                 }}
-                type="button"
+                type='button'
               >
                 Cancel
               </Button>
-              <Button className="cursor-pointer" type="submit">
+              <Button className='cursor-pointer' type='submit'>
                 Save Witness
               </Button>
             </div>

@@ -1,10 +1,11 @@
 /* eslint-disable import/order */
+
 'use client';
 import React, { useEffect, useRef, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod';
-import { ClaimType, Relationship } from '@prisma/client';
+import { ClaimType, Incident, Relationship } from '@prisma/client';
 import DatePicker from 'react-datepicker';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 
@@ -34,7 +35,7 @@ import WitnessFormComponent from '@/components/claim/witness-form';
 export default function CreateNewClaim() {
   const searchParams = useSearchParams();
   const claimIdForUpdate = searchParams.get('claimId');
-  const incidentId = searchParams.get('incidentId');
+  // const incidentId = searchParams.get('incidentId');
   const params = useParams();
   const userId = params?.userId;
   const router = useRouter();
@@ -43,6 +44,10 @@ export default function CreateNewClaim() {
   const [dateCreated, setDateCreated] = useState<string>();
   const formDataLoaded = useRef<boolean>(false);
   const [isPending, startTransition] = useTransition();
+
+  // const [incidentArr, setIncidentArr] = useState<Incident>(incidentId);
+  const [isEdit, setIsEdit] = useState<boolean>(false);
+  const [editingIncident, setEditingIncident] = useState<zod.infer<typeof IncidentSchema> | null>(null);
 
   const [savedClaimId, setClaimSavedId] = useState<string>();
 
@@ -74,14 +79,14 @@ export default function CreateNewClaim() {
       roleId: '',
     },
   });
-  const { control, getValues } = useForm<zod.infer<typeof injuredIncidentSchema>>({
+  const { control, getValues, setValue,  } = useForm<zod.infer<typeof injuredIncidentSchema>>({
     resolver: zodResolver(injuredIncidentSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
+      firstname: '',
+      lastname: '',
       email: '',
       phone: '',
-      address: '',
+      mailingAddress: '',
       attorneyFirstName: '',
       attorneyLastName: '',
     },
@@ -94,55 +99,22 @@ export default function CreateNewClaim() {
       setIncidentData(claimIdForUpdate);
     }
   }, [claimIdForUpdate, formDataLoaded]);
-  
-  const getIncidentByIncidentId = async () => {
-    if (incidentId) {
-      try {
-        const incidentData = await getIncidentById(incidentId);
-  
-        if (incidentData) {
-          form.setValue("date", new Date(incidentData.date) || new Date());
-          form.setValue("location", incidentData.location || "");
-          form.setValue("description", incidentData.description || "");
-          form.setValue("policeOfficer", incidentData.policeOfficer || "");
-          form.setValue("reportNumber", incidentData.reportNumber || "");
-          form.setValue("amountLoss", incidentData.amountLoss || "");
-          form.setValue("timeLoss", incidentData.timeLoss || "");
-          form.setValue("priorRepresentationReason", incidentData.priorRepresentationReason || "");
-          form.setValue("id", incidentData.id || undefined);
-          form.setValue("time", new Date(incidentData.time) || new Date());
-          form.setValue("timeOfDay", incidentData.timeOfDay || "PM");
-          form.setValue("workRelated", incidentData.workRelated || false);
-          form.setValue("policeReportCompleted", incidentData.policeReportCompleted || false);
-          form.setValue("policeStation", incidentData.policeStation || "");
-          form.setValue("reportCompleted", incidentData.reportCompleted || false);
-          form.setValue("supportingDocument", incidentData.supportingDocument || false);
-          form.setValue("supportingDocumentUpload", incidentData.supportingDocumentUpload || "");
-          form.setValue("lostEarning", incidentData.lostEarning || false);
-          form.setValue("priorRepresentation", incidentData.priorRepresentation || false);
-          form.setValue("claimId", incidentData.claimId || "");
-          form.setValue("roleId", incidentData.roleId || "");
-        }
-      } catch (error) {
-        console.error("Error fetching incident data:", error);
-      }
-    }
-  };
-
-  useEffect(() => {
-    getIncidentByIncidentId();
-  }, []);
 
   const setIncidentData = async (id: string) => {
-    if(claimIdForUpdate){
-      setClaimSavedId(claimIdForUpdate)
+    if (claimIdForUpdate) {
+      setClaimSavedId(claimIdForUpdate);
     }
+
+    
     formDataLoaded.current = true;
     let claimToEditString = sessionStorage.getItem('claimToEdit');
     const claimToEdit: zod.infer<typeof ClaimSchema> = JSON.parse(claimToEditString || '');
+    const roleDate = claimToEdit?.clientRole?.account;
 
     form.setValue('claimType', claimToEdit.type);
+    
     const incidentToEdit = claimToEdit?.incident || {};
+    
 
     Object.keys(incidentToEdit).forEach((key) => {
       if (key === 'date') {
@@ -157,10 +129,38 @@ export default function CreateNewClaim() {
       }
     });
 
+ 
+     
     form.setValue('supportingDocument', false);
     form.setValue('time', new Date());
+
+    // console.log("Haseeb here",roleDate )
+    if (roleDate) {
+      Object.keys(roleDate).forEach((key) => {
+        if (key in getValues()) {
+          setValue(key as keyof zod.infer<typeof injuredIncidentSchema>, roleDate[key as keyof typeof roleDate] || '');
+        }
+      });
+    }
   };
   const onError = (errors: any) => {};
+
+  const handleEditClick = (
+    incidentData: zod.infer<typeof IncidentSchema>,
+    roleDate: zod.infer<typeof injuredIncidentSchema>
+  ) => {
+    setIsEdit(true);
+    setEditingIncident(incidentData);
+
+    (Object.keys(incidentData) as (keyof zod.infer<typeof IncidentSchema>)[]).forEach((key) => {
+      form.setValue(key, incidentData[key]);
+    });
+    Object.keys(roleDate).forEach((key) => {
+      if (key in getValues()) {
+        setValue(key as keyof zod.infer<typeof injuredIncidentSchema>, roleDate[key as keyof typeof roleDate] || '');
+      }
+    });
+  };
 
   const onSubmit = async (values: zod.infer<typeof IncidentSchema>) => {
     const userInfo = sessionStorage.getItem('userInfo');
@@ -170,12 +170,15 @@ export default function CreateNewClaim() {
     const formValues = getValues();
 
     const accountPayload = {
-      firstname: formValues?.firstName || userDetails?.firstname,
-      lastname: formValues?.lastName || userDetails?.lastname,
+      firstname: formValues?.firstname || userDetails?.firstname,
+      lastname: formValues?.lastname || userDetails?.lastname,
       phone: formValues?.phone || userDetails?.phone,
       email: formValues?.email || userDetails?.email,
-      mailingAddress: formValues?.address || userDetails?.mailingAddress1,
+      mailingAddress: formValues?.mailingAddress || userDetails?.mailingAddress1,
     };
+
+
+ 
 
     const roleTypePayload = {
       roleType: 'Injury party',
@@ -204,18 +207,20 @@ export default function CreateNewClaim() {
         },
       },
     };
+ 
 
+    const incidentId =  "b86a2c1f-96a6-4106-8ec7-15757239ea6d"
     const claim = await createClaim(claimPayload);
     const claimId = claim.success.id;
     const attorneyPayload = {
       firstname: formValues?.attorneyFirstName,
       lastname: formValues?.attorneyLastName,
     };
-    setClaimSavedId(claimId);
+    // setClaimSavedId(claimId);
     setError('');
     setSuccess('');
     startTransition(() => {
-      createOrUpdateIncident(values, claimId, attorneyPayload).then((data) => {
+      createOrUpdateIncident(values, claimId, attorneyPayload, incidentId).then((data) => {
         setError(data.error);
         if (data?.success) {
           setSuccess('Success');
@@ -242,7 +247,7 @@ export default function CreateNewClaim() {
   ];
 
   return (
-    <div className='flex w-full flex-row justify-center  px-[10px] pt-2.5 md:px-0 mb-16 md:pt-10 lg:px-0 xl:px-0'>
+    <div className='mb-16 flex w-full flex-row  justify-center px-[10px] pt-2.5 md:px-0 md:pt-10 lg:px-0 xl:px-0'>
       <div className='w-full md:w-[499px]'>
         <Form {...form}>
           <form className='space-y-4' onSubmit={form.handleSubmit(onSubmit, onError)}>
@@ -327,7 +332,7 @@ export default function CreateNewClaim() {
                       <>
                         <FormField
                           control={control}
-                          name='firstName'
+                          name='firstname'
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>First Name</FormLabel>
@@ -341,7 +346,7 @@ export default function CreateNewClaim() {
 
                         <FormField
                           control={control}
-                          name='lastName'
+                          name='lastname'
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Last Name</FormLabel>
@@ -383,7 +388,7 @@ export default function CreateNewClaim() {
 
                         <FormField
                           control={control}
-                          name='address'
+                          name='mailingAddress'
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Address</FormLabel>
@@ -744,20 +749,22 @@ export default function CreateNewClaim() {
                     <Button className='cursor-pointer' disabled={isPending} type='submit'>
                       Submit
                     </Button>
+
+
                   </div>
                 </div>
-
-                
               </>
             )}
           </form>
         </Form>
         {/* Witness Part  */}
-        {(selectedClaimType && savedClaimId) && ( <div className='mt-[21px] flex  flex-row rounded-[12px] border border-purple bg-white p-[15px]'>
+        {selectedClaimType && (
+          //  savedClaimId &&
+          <div className='mt-[21px] flex  flex-row rounded-[12px] border border-purple bg-white p-[15px]'>
             <div className='flex-grow space-y-[5px]'>
               <CardHeading title='Witness' />
               <div className='pb-5' />
-              <WitnessFormComponent claimId={savedClaimId} witness={[]}                  />
+              <WitnessFormComponent claimId={savedClaimId} witness={[]} />
             </div>
           </div>
         )}

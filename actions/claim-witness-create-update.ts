@@ -14,39 +14,39 @@ export const createOrUpdateWitness = async (values: zod.infer<typeof WitnessSche
   const { id, witnessFirstName, witnessLastName, witnessPhone, claimId }: any = validatedFields.data;
 
   try {
-    if (id && id !== "") {
+    if (id && id !== '') {
       // Update an existing witness
       const updatedWitness = await db.witness.update({
         where: { id },
         data: {
           witnessDetails: {
-            update: {
-              where: { id: witnessDetailId }, // Replace with the correct WitnessDetail ID
-              data: {
-                role: {
-                  update: {
-                    account: {
-                      update: {
-                        firstname: witnessFirstName,
-                        lastname: witnessLastName,
-                        phone: witnessPhone,
-                      },
-                    },
-                    roletype: {
-                      connectOrCreate: {
-                        where: {
-                          roleType: 'Witness', // Ensure the `roleType` value is unique
-                        },
-                        create: {
-                          roleType: 'Witness',
-                          createdBy: 'system', // Optional: Populate other fields as necessary
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
+            // update: {
+            //   where: { id: witnessDetailId }, // Replace with the correct WitnessDetail ID
+            //   data: {
+            //     role: {
+            //       update: {
+            //         account: {
+            //           update: {
+            //             firstname: witnessFirstName,
+            //             lastname: witnessLastName,
+            //             phone: witnessPhone,
+            //           },
+            //         },
+            //         roletype: {
+            //           connectOrCreate: {
+            //             where: {
+            //               roleType: 'Witness', // Ensure the `roleType` value is unique
+            //             },
+            //             create: {
+            //               roleType: 'Witness',
+            //               createdBy: 'system', // Optional: Populate other fields as necessary
+            //             },
+            //           },
+            //         },
+            //       },
+            //     },
+            //   },
+            // },
           },
         },
         include: {
@@ -62,7 +62,6 @@ export const createOrUpdateWitness = async (values: zod.infer<typeof WitnessSche
           },
         },
       });
-      
 
       return { success: updatedWitness, message: 'Witness has been updated successfully' };
     } else {
@@ -113,8 +112,6 @@ export const createOrUpdateWitness = async (values: zod.infer<typeof WitnessSche
     return { error: 'Failed to create or update witness', details: error };
   }
 };
-
-
 
 // Delete function for Witness
 // export const deleteWitness = async (id: number) => {

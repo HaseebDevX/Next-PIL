@@ -15,8 +15,7 @@ import { SimpleText } from './simpleText';
 
 const ClaimListCreate = (prop?: { user?: any; userClaims?: Zod.infer<typeof ClaimSchema>[] }) => {
   const [progress, setProgress] = useState(15);
-  
-console.log("userClaims", prop)
+
   useEffect(() => {
     data1();
   }),
@@ -34,13 +33,13 @@ console.log("userClaims", prop)
           <div className='pb-[37px] pt-[43px]'>
             <div className='flex flex-col items-center '>
               <HalfCircleProgressBar progress={progress} />
-              <p className='text-gingerRegular text-themeLightPurple2 pt-2.5 text-[18px]'>Unable to submit claim</p>
+              <p className='text-gingerRegular pt-2.5 text-[18px] text-themeLightPurple2'>Unable to submit claim</p>
             </div>
           </div>
         </div>
         <div className='flex w-full flex-row justify-center px-[15px] md:px-0 lg:px-0 xl:px-0'>
           <div className='min-w-full md:min-w-[520px]'>
-            <div className='bg-themeGrayLight mt-[-15px] flex  flex-row items-start rounded-[12px] px-5 py-[15px]'>
+            <div className='mt-[-15px] flex flex-row  items-start rounded-[12px] bg-themeGrayLight px-5 py-[15px]'>
               <div className='flex-grow'>
                 <CardHeading title='Account Details' />
                 <SimpleText
@@ -93,7 +92,9 @@ console.log("userClaims", prop)
                       className='btn max-w-[105px] cursor-pointer text-center'
                       onClick={() => {
                         sessionStorage.setItem('claimToEdit', JSON.stringify(claim));
-                        router.push(`claim/incident/${prop?.user?.id}?incidentId=${claim?.incident?.id ?? ''}&claimId=${claim?.id ?? ''} `);
+                        router.push(
+                          `claim/incident/${prop?.user?.id}?incidentId=${claim?.incident?.id ?? ''}&claimId=${claim?.id ?? ''} `
+                        );
                       }}
                     >
                       Edit
